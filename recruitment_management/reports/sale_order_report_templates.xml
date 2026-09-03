@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Custom Sale Order Report with Conditional Price Display -->
+    <template id="report_saleorder_document_custom" name="Sale Order Report - Custom Price Display" inherit_id="sale.report_saleorder_document">
+
+        <!-- Change "Description" to "Services" -->
+        <xpath expr="//th[@name='th_description']" position="replace">
+            <th name="th_description" class="text-start">Services</th>
+        </xpath>
+
+        <!-- Add Fee % column header after Quantity -->
+        <xpath expr="//th[@name='th_quantity']" position="after">
+            <th name="th_fee_percentage" class="text-end text-nowrap">Fee %</th>
+        </xpath>
+
+        <!-- Add condition to Unit Price header -->
+        <xpath expr="//th[@name='th_priceunit']" position="attributes">
+            <attribute name="t-if">doc.show_prices</attribute>
+        </xpath>
+
+        <!-- Add condition to Discount header -->
+        <xpath expr="//th[@name='th_discount']" position="attributes">
+            <attribute name="t-if">doc.show_prices and display_discount</attribute>
+        </xpath>
+
+        <!-- Add condition to Taxes header -->
+        <xpath expr="//th[@name='th_taxes']" position="attributes">
+            <attribute name="t-if">doc.show_prices and display_taxes</attribute>
+        </xpath>
+
+        <!-- Add condition to Subtotal header -->
+        <xpath expr="//th[@name='th_subtotal']" position="attributes">
+            <attribute name="t-if">doc.show_prices</attribute>
+        </xpath>
+
+        <!-- Add Fee % cell after quantity in regular product lines -->
+        <xpath expr="//td[@name='td_product_quantity']" position="after">
+            <td name="td_product_fee_percentage" class="text-end text-nowrap">
+                <span t-if="line.fee_percentage" t-esc="'{:.2f}%'.format(line.fee_percentage)"/>
+                <span t-else="">-</span>
+            </td>
+        </xpath>
+
+        <!-- Add condition to Unit Price cell -->
+        <xpath expr="//td[@name='td_product_priceunit']" position="attributes">
+            <attribute name="t-if">doc.show_prices</attribute>
+        </xpath>
+
+        <!-- Add condition to Discount cell -->
+        <xpath expr="//td[@name='td_product_discount']" position="attributes">
+            <attribute name="t-if">doc.show_prices and display_discount</attribute>
+        </xpath>
+
+        <!-- Add condition to Taxes cell -->
+        <xpath expr="//td[@name='td_product_taxes']" position="attributes">
+            <attribute name="t-if">doc.show_prices and display_taxes</attribute>
+        </xpath>
+
+        <!-- Add condition to Subtotal cell -->
+        <xpath expr="//td[@name='td_product_subtotal']" position="replace">
+            <td t-if="doc.show_prices and not line.is_downpayment" name="td_product_subtotal" class="text-end o_price_total">
+                <t t-if="not collapse_prices">
+                    <span
+                        t-if="price_field == 'price_subtotal'"
+                        t-field="line.price_subtotal"
+                    >
+                        27.00
+                    </span>
+                    <span t-else="" t-field="line.price_total">
+                        27.00
+                    </span>
+                </t>
+            </td>
+        </xpath>
+
+
+        <!-- Hide totals section when show_prices is False -->
+        <xpath expr="//div[@id='total']" position="attributes">
+            <attribute name="t-if">doc.show_prices</attribute>
+        </xpath>
+
+        <!-- Add info message when prices are hidden -->
+        <xpath expr="//table[hasclass('o_main_table')]" position="before">
+            <div t-if="not doc.show_prices" class="alert alert-info text-center mb-4">
+                <p class="mb-0"><strong>Price Information Available Upon Request</strong></p>
+                <p class="mb-0">Please contact us for detailed pricing information and custom quotes.</p>
+            </div>
+        </xpath>
+
+    </template>
+
+</odoo>

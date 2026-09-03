@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inherit Sale Order Form View -->
+    <record id="view_order_form_bc_recruitment" model="ir.ui.view">
+        <field name="name">sale.order.form.bc.recruitment</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Add BC Recruitment checkbox in header -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="is_bc_recruitment" widget="boolean_toggle" readonly="state in ['sale', 'done', 'cancel']"/>
+            </xpath>
+
+            <!-- Add Job Orders button in button box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_job_orders" type="object" class="oe_stat_button"
+                        icon="fa-briefcase" invisible="job_order_count == 0 or not is_bc_recruitment">
+                    <field name="job_order_count" widget="statinfo" string="Job Orders"/>
+                </button>
+                <button name="action_bc_dashboard" type="object" class="oe_stat_button"
+                        icon="fa-dashboard" invisible="not is_bc_recruitment"
+                        string="BC Dashboard"/>
+            </xpath>
+
+            <xpath expr="//field[@name='partner_id']" position="attributes">
+                <attribute name="context">{'search_default_is_bc_client': is_bc_recruitment}</attribute>
+            </xpath>
+
+        </field>
+    </record>
+
+    <!-- Inherit Sale Order List View -->
+    <record id="view_quotation_tree_bc_recruitment" model="ir.ui.view">
+        <field name="name">sale.order.list.bc.recruitment</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="is_bc_recruitment" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

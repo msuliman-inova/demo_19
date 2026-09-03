@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_bc_worker_user,bc.worker.user,model_bc_worker,group_bc_recruitment_user,1,1,1,0
+access_bc_worker_manager,bc.worker.manager,model_bc_worker,group_bc_recruitment_manager,1,1,1,1
+access_bc_worker_skill_user,bc.worker.skill.user,model_bc_worker_skill,group_bc_recruitment_user,1,0,0,0
+access_bc_worker_skill_manager,bc.worker.skill.manager,model_bc_worker_skill,group_bc_recruitment_manager,1,1,1,1
+access_bc_job_order_user,bc.job.order.user,model_bc_job_order,group_bc_recruitment_user,1,1,1,0
+access_bc_job_order_manager,bc.job.order.manager,model_bc_job_order,group_bc_recruitment_manager,1,1,1,1
+access_bc_placement_user,bc.placement.user,model_bc_placement,group_bc_recruitment_user,1,1,1,0
+access_bc_placement_manager,bc.placement.manager,model_bc_placement,group_bc_recruitment_manager,1,1,1,1
+access_bc_worker_skill_sales,bc.worker.skill.sales,model_bc_worker_skill,sales_team.group_sale_salesman,1,0,0,0
+access_job_order_complete_wizard_user,job.order.complete.wizard.user,model_job_order_complete_wizard,group_bc_recruitment_user,1,1,1,1
+access_job_order_complete_wizard_manager,job.order.complete.wizard.manager,model_job_order_complete_wizard,group_bc_recruitment_manager,1,1,1,1
+access_bc_dashboard_wizard_user,bc.dashboard.wizard.user,model_bc_dashboard_wizard,group_bc_recruitment_user,1,1,1,1
+access_bc_dashboard_wizard_manager,bc.dashboard.wizard.manager,model_bc_dashboard_wizard,group_bc_recruitment_manager,1,1,1,1
+access_bc_dashboard_wizard_sales,bc.dashboard.wizard.sales,model_bc_dashboard_wizard,sales_team.group_sale_salesman,1,1,1,1

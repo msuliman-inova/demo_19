@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- CRM Lead Form - Add Recruitment Request Smart Button -->
+    <record id="view_crm_lead_form_recruitment_request" model="ir.ui.view">
+        <field name="name">crm.lead.form.recruitment.request</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Add smart button -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_recruitment_request"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-briefcase"
+                        invisible="not is_recruitment_lead">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Recruitment</span>
+                        <span class="o_stat_text">Request</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <!-- Add recruitment request fields -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="recruitment_request_id" readonly="1"
+                       invisible="not is_recruitment_lead"/>
+                <field name="is_recruitment_lead" invisible="1"/>
+                <field name="subject_id"/>
+            </xpath>
+
+            <!-- Add contact preferences fields -->
+            <xpath expr="//field[@name='tag_ids']" position="after">
+                <field name="category"/>
+                <field name="preferred_contact_method"/>
+                <field name="best_time_to_contact"/>
+                <label for="email_attach" invisible="type == 'lead'"/>
+                <div class="d-flex align-items-center gap-1" invisible="type == 'lead'">
+                    <field name="email_attach" filename="email_attach_filename" nolabel="1"/>
+                    <field name="email_attach_filename" invisible="1"/>
+                    <button name="action_preview_email_attach" type="object"
+                            icon="fa-eye" class="btn-link p-0" title="Preview"
+                            invisible="not email_attach"/>
+                </div>
+                <label for="service_agreement" invisible="type == 'lead'"/>
+                <div class="d-flex align-items-center gap-1" invisible="type == 'lead'">
+                    <field name="service_agreement" filename="service_agreement_filename" nolabel="1"/>
+                    <field name="service_agreement_filename" invisible="1"/>
+                    <button name="action_preview_service_agreement" type="object"
+                            icon="fa-eye" class="btn-link p-0" title="Preview"
+                            invisible="not service_agreement"/>
+                </div>
+                <label for="demand_letter" invisible="type == 'lead'"/>
+                <div class="d-flex align-items-center gap-1" invisible="type == 'lead'">
+                    <field name="demand_letter" filename="demand_letter_filename" nolabel="1"/>
+                    <field name="demand_letter_filename" invisible="1"/>
+                    <button name="action_preview_demand_letter" type="object"
+                            icon="fa-eye" class="btn-link p-0" title="Preview"
+                            invisible="not demand_letter"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- CRM Lead Tree/List View - Add new fields -->
+    <record id="view_crm_lead_tree_recruitment" model="ir.ui.view">
+        <field name="name">crm.lead.tree.recruitment</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="subject_id" optional="hide"/>
+                <field name="category" optional="show"/>
+                <field name="country_id" optional="hide"/>
+                <field name="preferred_contact_method" optional="hide"/>
+                <field name="best_time_to_contact" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Requirements tab to opportunity form -->
+    <record id="view_crm_lead_form_requirements_tab" model="ir.ui.view">
+        <field name="name">crm.lead.form.requirements.tab</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='extra']" position="before">
+                <page string="Inquiry Details" name="requirements" invisible="type == 'lead'">
+                    <field name="requirement_line_ids">
+                        <list editable="bottom">
+                            <field name="product_id"/>
+                            <field name="description"/>
+                            <field name="quantity"/>
+                            <field name="price_unit"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Convert to Recruitment Button - Separate view with dependency on sale_crm -->
+    <record id="view_crm_lead_form_recruitment_convert_button" model="ir.ui.view">
+        <field name="name">crm.lead.form.recruitment.convert.button</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="sale_crm.crm_case_form_view_oppor"/>
+        <field name="arch" type="xml">
+            <!-- Add Convert to Recruitment Button after New Quotation button -->
+            <xpath expr="//button[@name='action_sale_quotations_new']" position="after">
+                <button name="action_convert_to_recruitment"
+                        string="Convert to Local Recruitment"
+                        type="object"
+                        class="oe_highlight btn_convert_local_recruitment"
+                        data-hotkey="shift+r"
+                        icon="fa-exchange"
+                        invisible="is_recruitment_lead or type == 'lead'"
+                        groups="recruitment_management.group_recruitment_user"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

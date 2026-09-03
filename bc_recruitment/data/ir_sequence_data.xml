@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Sequence for BC Worker -->
+        <record id="seq_bc_worker" model="ir.sequence">
+            <field name="name">BC Worker Sequence</field>
+            <field name="code">bc.worker</field>
+            <field name="prefix">BCW</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for BC Job Order -->
+        <record id="seq_bc_job_order" model="ir.sequence">
+            <field name="name">BC Job Order Sequence</field>
+            <field name="code">bc.job.order</field>
+            <field name="prefix">JO</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+        <!-- Sequence for BC Placement -->
+        <record id="seq_bc_placement" model="ir.sequence">
+            <field name="name">BC Placement Sequence</field>
+            <field name="code">bc.placement</field>
+            <field name="prefix">PL</field>
+            <field name="padding">5</field>
+            <field name="company_id" eval="False"/>
+        </record>
+
+    </data>
+</odoo>

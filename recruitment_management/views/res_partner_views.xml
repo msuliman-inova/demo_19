@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add User Type field and job_ids to Partner Form View -->
+    <record id="view_partner_form_user_type" model="ir.ui.view">
+        <field name="name">res.partner.form.user.type</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+          <xpath expr="//div[@name='button_box']" position="inside">
+            <button class="oe_stat_button" type="object" name="action_open_jobs" icon="fa-briefcase">
+              <field name="job_ids" widget="statinfo"/>
+            </button>
+          </xpath>
+          <xpath expr="//field[@name='company_type']" position="after">
+            <field name="user_type" widget="radio" options="{'horizontal': true}"/>
+          </xpath>
+        </field>
+    </record>
+
+    <!-- Add User Type field to User Form View -->
+    <record id="view_users_form_user_type" model="ir.ui.view">
+        <field name="name">res.users.form.user.type</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="user_type" widget="radio" options="{'horizontal': true}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add User Type in Partner Tree View (optional) -->
+    <record id="view_partner_tree_user_type" model="ir.ui.view">
+        <field name="name">res.partner.tree.user.type</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='email']" position="after">
+                <field name="user_type" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add User Type filter in Partner Search View -->
+    <record id="view_res_partner_filter_user_type" model="ir.ui.view">
+        <field name="name">res.partner.search.user.type</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='inactive']" position="after">
+                <separator/>
+                <filter string="Employees" name="employee" domain="[('user_type', '=', 'employee')]"/>
+                <filter string="Employers" name="employer" domain="[('user_type', '=', 'employer')]"/>
+            </xpath>
+            <xpath expr="//group[@name='group_by']" position="inside">
+                <filter string="User Type" name="group_user_type" context="{'group_by': 'user_type'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

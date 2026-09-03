@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Assigned Employee to Sale Order Form View -->
+    <record id="view_sale_order_form_assigned_employee" model="ir.ui.view">
+        <field name="name">sale.order.form.assigned.employee</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="assigned_employee_id"
+                       options="{'no_create': True, 'no_open': True}"
+                       readonly="state in ('sale', 'done', 'cancel')"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Assigned Employee to Sale Order Tree View -->
+    <record id="view_sale_order_tree_assigned_employee" model="ir.ui.view">
+        <field name="name">sale.order.tree.assigned.employee</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_quotation_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="assigned_employee_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Assigned Employee Filter and Group By to Sale Search View -->
+    <record id="view_sale_order_search_assigned_employee" model="ir.ui.view">
+        <field name="name">sale.order.search.assigned.employee</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.sale_order_view_search_inherit_sale"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='my_sale_orders_filter']" position="after">
+                <separator/>
+                <filter string="My Assigned Orders" name="my_assigned"
+                        domain="[('assigned_employee_id.user_id', '=', uid)]"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="Assigned Employee" name="group_assigned_employee"
+                        context="{'group_by': 'assigned_employee_id'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

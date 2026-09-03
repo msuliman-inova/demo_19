@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_job_seeker_registration_public,job.seeker.registration.public,model_job_seeker_registration,base.group_public,1,0,1,0
+access_job_seeker_registration_user,job.seeker.registration.user,model_job_seeker_registration,hr_recruitment.group_hr_recruitment_user,1,1,1,0
+access_job_seeker_registration_manager,job.seeker.registration.manager,model_job_seeker_registration,hr_recruitment.group_hr_recruitment_manager,1,1,1,1
+access_job_seeker_convert_wizard_user,job.seeker.convert.wizard.user,model_job_seeker_convert_wizard,hr_recruitment.group_hr_recruitment_user,1,1,1,1
+access_job_seeker_convert_wizard_manager,job.seeker.convert.wizard.manager,model_job_seeker_convert_wizard,hr_recruitment.group_hr_recruitment_manager,1,1,1,1

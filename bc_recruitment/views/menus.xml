@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Root Menu -->
+    <menuitem id="menu_bc_recruitment_root"
+              name="BC Recruitment"
+              sequence="50"
+              web_icon="bc_recruitment,static/description/icon.png"/>
+
+    <!-- Main Menus -->
+    <menuitem id="menu_bc_recruitment_operations"
+              name="Operations"
+              parent="menu_bc_recruitment_root"
+              sequence="10"/>
+
+    <menuitem id="menu_bc_recruitment_workers"
+              name="Workers"
+              parent="menu_bc_recruitment_root"
+              sequence="20"/>
+
+    <menuitem id="menu_bc_recruitment_configuration"
+              name="Configuration"
+              parent="menu_bc_recruitment_root"
+              sequence="100"
+              groups="bc_recruitment.group_bc_recruitment_manager"/>
+
+    <!-- Operations Submenus -->
+    <menuitem id="menu_bc_job_orders"
+              name="Job Orders"
+              parent="menu_bc_recruitment_operations"
+              action="action_bc_job_order"
+              sequence="10"/>
+
+    <menuitem id="menu_bc_placements"
+              name="Placements"
+              parent="menu_bc_recruitment_operations"
+              action="action_bc_placement"
+              sequence="20"/>
+
+    <!-- Workers Submenus -->
+    <menuitem id="menu_bc_workers"
+              name="All Workers"
+              parent="menu_bc_recruitment_workers"
+              action="action_bc_worker"
+              sequence="10"/>
+
+    <!-- Configuration Submenus -->
+    <menuitem id="menu_bc_worker_skills"
+              name="Worker Skills"
+              parent="menu_bc_recruitment_configuration"
+              action="action_bc_worker_skill"
+              sequence="10"/>
+
+</odoo>

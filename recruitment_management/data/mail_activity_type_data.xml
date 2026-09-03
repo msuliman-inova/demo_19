@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Post-Hire Reminder Activity Type -->
+        <record id="mail_activity_type_post_hire_reminder" model="mail.activity.type">
+            <field name="name">Post-Hire Follow-up</field>
+            <field name="summary">15-Day Post-Hire Reminder</field>
+            <field name="delay_count">15</field>
+            <field name="delay_unit">days</field>
+            <field name="delay_from">current_date</field>
+            <field name="icon">fa-user-check</field>
+            <field name="res_model">hr.applicant</field>
+        </record>
+    </data>
+</odoo>

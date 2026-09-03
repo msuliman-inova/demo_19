@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="action_report_recruitment_request" model="ir.actions.report">
+        <field name="name">Recruitment Request</field>
+        <field name="model">recruitment.request</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">recruitment_management.report_recruitment_request_document</field>
+        <field name="report_file">recruitment_management.report_recruitment_request_document</field>
+        <field name="binding_model_id" ref="model_recruitment_request"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

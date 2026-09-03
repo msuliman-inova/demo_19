@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Portal Template for Interview Details -->
+    <template id="portal_interview_details" name="Interview Details">
+        <t t-call="portal.portal_layout">
+            <t t-set="additional_title">Interview Details</t>
+
+            <div id="wrap" class="oe_structure">
+                <div class="container mt-4">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <!-- Header -->
+                            <div class="card mb-4">
+                                <div class="card-header bg-primary text-white">
+                                    <h3 class="mb-0">
+                                        <i class="fa fa-video-camera me-2"/>
+                                        Interview Details - <t t-esc="applicant.partner_name"/>
+                                    </h3>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p><strong>Position:</strong> <t t-esc="applicant.job_id.name or 'N/A'"/></p>
+                                            <p><strong>Interview Date:</strong>
+                                                <t t-if="applicant.interview_date">
+                                                    <t t-esc="applicant.interview_date.strftime('%B %d, %Y at %I:%M %p')"/>
+                                                </t>
+                                                <t t-else="">Not scheduled</t>
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p><strong>Platform:</strong>
+                                                <t t-if="applicant.interview_platform">
+                                                    <t t-esc="dict(applicant._fields['interview_platform'].selection).get(applicant.interview_platform)"/>
+                                                </t>
+                                                <t t-else="">N/A</t>
+                                            </p>
+                                            <p t-if="applicant.interview_meeting_url">
+                                                <strong>Meeting Link:</strong>
+                                                <a t-att-href="applicant.interview_meeting_url" target="_blank" class="btn btn-sm btn-primary ms-2">
+                                                    <i class="fa fa-external-link"/> Join Meeting
+                                                </a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Interview Recordings -->
+                            <div class="card mb-4" t-if="applicant.google_drive_folder_url or applicant.google_drive_recording_urls">
+                                <div class="card-header bg-info text-white">
+                                    <h4 class="mb-0">
+                                        <i class="fa fa-film me-2"/>
+                                        Interview Recordings
+                                    </h4>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Google Drive Folder -->
+                                    <div class="mb-3" t-if="applicant.google_drive_folder_url">
+                                        <a t-att-href="applicant.google_drive_folder_url" target="_blank" class="btn btn-success">
+                                            <i class="fa fa-folder-open me-2"/>
+                                            Open Google Drive Folder
+                                        </a>
+                                    </div>
+
+                                    <!-- Recording Links -->
+                                    <div t-if="applicant.google_drive_recording_urls">
+                                        <h5>Recording Links:</h5>
+                                        <t t-set="recording_links" t-value="applicant.get_recording_links_list()"/>
+                                        <ul class="list-group">
+                                            <t t-foreach="recording_links" t-as="link">
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    Recording <t t-esc="link_index + 1"/>
+                                                    <a t-att-href="link" target="_blank" class="btn btn-sm btn-primary">
+                                                        <i class="fa fa-play-circle me-1"/>
+                                                        View Recording
+                                                    </a>
+                                                </li>
+                                            </t>
+                                        </ul>
+                                    </div>
+
+                                    <div t-if="not applicant.google_drive_folder_url and not applicant.google_drive_recording_urls" class="text-muted">
+                                        <i class="fa fa-info-circle me-2"/>
+                                        No recordings available yet.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Interview Notes (Optional - only show if needed) -->
+                            <div class="card mb-4" t-if="applicant.interview_notes and show_notes">
+                                <div class="card-header bg-secondary text-white">
+                                    <h4 class="mb-0">
+                                        <i class="fa fa-file-text-o me-2"/>
+                                        Interview Summary
+                                    </h4>
+                                </div>
+                                <div class="card-body">
+                                    <t t-raw="applicant.interview_notes"/>
+                                </div>
+                            </div>
+
+                            <!-- Footer Info -->
+                            <div class="alert alert-info mt-4">
+                                <i class="fa fa-lock me-2"/>
+                                <strong>Secure Access:</strong> This page is accessible only via the secure link provided.
+                                Please do not share this link with unauthorized parties.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Access Denied Template -->
+    <template id="portal_interview_access_denied" name="Interview Access Denied">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-5">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="alert alert-danger text-center">
+                            <i class="fa fa-ban fa-3x mb-3"/>
+                            <h2>Access Denied</h2>
+                            <p>The interview details you are trying to access are either invalid or no longer available.</p>
+                            <p>Please contact your recruitment officer for assistance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+</odoo>

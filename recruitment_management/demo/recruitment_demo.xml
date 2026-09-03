@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Demo Company: Tech Solutions Inc -->
+        <record id="partner_demo_employer_1" model="res.partner">
+            <field name="name">Tech Solutions Inc</field>
+            <field name="is_company">True</field>
+            <field name="email">contact@techsolutions.com</field>
+            <field name="phone">+971-4-123-4567</field>
+            <field name="street">Sheikh Zayed Road</field>
+            <field name="city">Dubai</field>
+            <field name="country_id" ref="base.ae"/>
+        </record>
+
+        <!-- Demo Company: Digital Marketing Hub -->
+        <record id="partner_demo_employer_2" model="res.partner">
+            <field name="name">Digital Marketing Hub</field>
+            <field name="is_company">True</field>
+            <field name="email">hr@digitalmarketinghub.com</field>
+            <field name="phone">+971-6-987-6543</field>
+            <field name="street">Al Majaz</field>
+            <field name="city">Sharjah</field>
+            <field name="country_id" ref="base.ae"/>
+        </record>
+
+        <!-- Demo Request 1: Senior Software Engineer -->
+        <record id="demo_request_1" model="recruitment.request">
+            <field name="name">RR00001</field>
+            <field name="partner_id" ref="partner_demo_employer_1"/>
+            <field name="work_location">Dubai, UAE</field>
+            <field name="remote_work">True</field>
+            <field name="benefits">Health Insurance, Annual Leave, Performance Bonuses, Training Budget</field>
+            <field name="priority">1</field>
+        </record>
+
+        <record id="demo_request_1_line_1" model="recruitment.request.line">
+            <field name="request_id" ref="demo_request_1"/>
+            <field name="sequence">10</field>
+            <field name="job_title">Senior Software Engineer</field>
+            <field name="no_of_positions">2</field>
+            <field name="emp_contract_type" ref="hr.contract_type_permanent"/>
+            <field name="experience_years">5</field>
+            <field name="job_description"><![CDATA[
+                <p>We are looking for an experienced Senior Software Engineer to join our growing team.</p>
+                <p><strong>Responsibilities:</strong></p>
+                <ul>
+                    <li>Design and develop scalable web applications</li>
+                    <li>Lead technical discussions and code reviews</li>
+                    <li>Mentor junior developers</li>
+                    <li>Collaborate with cross-functional teams</li>
+                </ul>
+            ]]></field>
+            <field name="requirements"><![CDATA[
+                <ul>
+                    <li>Bachelor's degree in Computer Science or related field</li>
+                    <li>5+ years of experience in software development</li>
+                    <li>Strong knowledge of Python, JavaScript, and SQL</li>
+                    <li>Experience with cloud platforms (AWS/Azure)</li>
+                    <li>Excellent problem-solving skills</li>
+                </ul>
+            ]]></field>
+            <field name="salary_from">15000</field>
+            <field name="salary_to">25000</field>
+        </record>
+
+        <!-- Demo Request 2: Digital Marketing Manager -->
+        <record id="demo_request_2" model="recruitment.request">
+            <field name="name">RR00002</field>
+            <field name="partner_id" ref="partner_demo_employer_2"/>
+            <field name="work_location">Sharjah, UAE</field>
+            <field name="remote_work">False</field>
+            <field name="benefits">Health Insurance, Performance Bonuses, Flexible Hours</field>
+            <field name="priority">0</field>
+        </record>
+
+        <record id="demo_request_2_line_1" model="recruitment.request.line">
+            <field name="request_id" ref="demo_request_2"/>
+            <field name="sequence">10</field>
+            <field name="job_title">Digital Marketing Manager</field>
+            <field name="no_of_positions">1</field>
+            <field name="emp_contract_type" ref="hr.contract_type_permanent"/>
+            <field name="experience_years">3</field>
+            <field name="job_description"><![CDATA[
+                <p>Seeking a creative and results-driven Digital Marketing Manager to lead our marketing initiatives.</p>
+                <p><strong>Key Responsibilities:</strong></p>
+                <ul>
+                    <li>Develop and execute digital marketing strategies</li>
+                    <li>Manage social media campaigns and content</li>
+                    <li>Analyze campaign performance and optimize ROI</li>
+                    <li>Collaborate with design and content teams</li>
+                </ul>
+            ]]></field>
+            <field name="requirements"><![CDATA[
+                <ul>
+                    <li>Bachelor's degree in Marketing or related field</li>
+                    <li>3+ years of digital marketing experience</li>
+                    <li>Proven track record of successful campaigns</li>
+                    <li>Strong knowledge of SEO, SEM, and social media</li>
+                    <li>Excellent analytical and communication skills</li>
+                </ul>
+            ]]></field>
+            <field name="salary_from">10000</field>
+            <field name="salary_to">15000</field>
+        </record>
+
+        <!-- Demo Request 3: UI/UX Designer (Draft) -->
+        <record id="demo_request_3" model="recruitment.request">
+            <field name="name">RR00003</field>
+            <field name="partner_id" ref="partner_demo_employer_1"/>
+            <field name="work_location">Dubai, UAE</field>
+            <field name="remote_work">True</field>
+            <field name="priority">0</field>
+        </record>
+
+        <record id="demo_request_3_line_1" model="recruitment.request.line">
+            <field name="request_id" ref="demo_request_3"/>
+            <field name="sequence">10</field>
+            <field name="job_title">UI/UX Designer</field>
+            <field name="no_of_positions">1</field>
+            <field name="emp_contract_type" ref="hr.contract_type_temporary"/>
+            <field name="experience_years">2</field>
+            <field name="job_description"><![CDATA[
+                <p>Looking for a talented UI/UX Designer to create intuitive and beautiful user experiences.</p>
+            ]]></field>
+            <field name="requirements"><![CDATA[
+                <ul>
+                    <li>Portfolio demonstrating UI/UX design skills</li>
+                    <li>2+ years of experience</li>
+                    <li>Proficiency in design tools (Figma, Adobe XD)</li>
+                </ul>
+            ]]></field>
+        </record>
+
+        <!-- Demo Request 4: Data Analyst (Approved) -->
+        <record id="demo_request_4" model="recruitment.request">
+            <field name="name">RR00004</field>
+            <field name="partner_id" ref="partner_demo_employer_2"/>
+            <field name="work_location">Sharjah, UAE</field>
+        </record>
+
+        <record id="demo_request_4_line_1" model="recruitment.request.line">
+            <field name="request_id" ref="demo_request_4"/>
+            <field name="sequence">10</field>
+            <field name="job_title">Data Analyst</field>
+            <field name="no_of_positions">1</field>
+            <field name="emp_contract_type" ref="hr.contract_type_permanent"/>
+            <field name="experience_years">3</field>
+            <field name="job_description"><![CDATA[
+                <p>We need a Data Analyst to help us make data-driven decisions.</p>
+            ]]></field>
+            <field name="salary_from">12000</field>
+            <field name="salary_to">18000</field>
+        </record>
+
+    </data>
+</odoo>

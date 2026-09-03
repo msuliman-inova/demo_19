@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Add recruitment percentage to sale order form view (order lines) -->
+    <record id="view_order_form_inherit_recruitment" model="ir.ui.view">
+        <field name="name">sale.order.form.recruitment</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <field name="payment_term_id" position="after">
+                <field name="show_prices" widget="boolean_toggle"/>
+            </field>
+            <!-- Recruitment invoicing policy field -->
+            <xpath expr="//header" position="inside">
+                <field name="recruitment_invoicing_policy" invisible="1"/>
+            </xpath>
+
+            <!-- Add Recruitment Request button in header button_box -->
+            <xpath expr="//sheet/div[@name='button_box']" position="inside">
+                <button name="action_view_recruitment_request"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-users"
+                        invisible="not recruitment_request_id">
+                    <div class="o_field_widget o_stat_info">
+                        <span class="o_stat_text">Recruitment Request</span>
+                    </div>
+                </button>
+            </xpath>
+
+            <xpath expr="//field[@name='show_prices']" position="before">
+                <field name="recruitment_request_id" readonly="1"/>
+            </xpath>
+            <!-- Add recruitment percentage and fee_percentage to order lines -->
+            <xpath expr="//field[@name='order_line']//list" position="inside">
+                <field name="fee_percentage" string="Service Perc %" optional="show"/>
+            </xpath>
+
+            <!-- Add recruitment fields in Other Information page -->
+            <xpath expr="//page[@name='other_information']" position="inside">
+                <group>
+                    <group string="Recruitment">
+                        <field name="is_recruitment_order" readonly="1"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

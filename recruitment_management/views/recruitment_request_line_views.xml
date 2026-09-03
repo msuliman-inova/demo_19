@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- List View for Recruitment Request Line -->
+    <record id="recruitment_request_line_list" model="ir.ui.view">
+        <field name="name">recruitment.request.line.list</field>
+        <field name="model">recruitment.request.line</field>
+        <field name="arch" type="xml">
+            <list string="Job Lines" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="job_title"/>
+                <field name="department_id" optional="show"/>
+                <field name="no_of_positions"/>
+                <field name="emp_contract_type"/>
+                <field name="experience_years" optional="hide"/>
+                <field name="job_skill_ids" widget="many2many_tags" optional="show"/>
+                <field name="salary_from" optional="hide"/>
+                <field name="salary_to" optional="hide"/>
+                <field name="pricing_percentage" string="Fee %" optional="show"/>
+                <!-- <field name="service_fee" sum="Total Service Fee"/> Removed as per requirement -->
+                <field name="currency_id" column_invisible="1"/>
+                <button name="action_open_form" type="object" string="Edit" icon="fa-edit" class="btn-primary"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View for Recruitment Request Line -->
+    <record id="recruitment_request_line_form" model="ir.ui.view">
+        <field name="name">recruitment.request.line.form</field>
+        <field name="model">recruitment.request.line</field>
+        <field name="arch" type="xml">
+            <form string="Job Line">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="job_title"/>
+                            <field name="department_id"/>
+                            <field name="no_of_positions"/>
+                            <field name="emp_contract_type"/>
+                        </group>
+                        <group>
+                            <field name="experience_years"/>
+                            <field name="expected_degree"/>
+                            <field name="salary_from"/>
+                            <field name="salary_to"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description">
+                            <field name="job_description" placeholder="Describe the job role, responsibilities, and daily tasks..."/>
+                        </page>
+
+                        <page string="Requirements">
+                            <field name="requirements" placeholder="List essential qualifications, certifications, and experience..."/>
+                        </page>
+
+                        <page string="Pricing">
+                            <group>
+                                <group>
+                                    <field name="pricing_percentage"/>
+                                    <!-- <field name="service_fee" readonly="1"/> Removed as per requirement -->
+                                </group>
+                            </group>
+                            <div class="alert alert-info" role="alert">
+                                <strong>Note:</strong> Fee Percentage can be manually adjusted (default is 8.33%).
+                            </div>
+                        </page>
+                    </notebook>
+
+                    <group string="Skills">
+                        <field name="job_skill_ids" widget="many2many_tags" options="{'no_create': True}" nolabel="1" placeholder="Add skills..."/>
+                        <group>
+                            <group string="Add Skills">
+                                <field name="skill_type_id" placeholder="Select skill category..."/>
+                                <field name="skill_id" domain="[('skill_type_id', '=', skill_type_id)]" placeholder="Select skill..." invisible="not skill_type_id"/>
+                            </group>
+                            <group>
+                                <button name="action_add_skill" string="Add Skill" type="object"
+                                        class="btn-primary" icon="fa-plus"
+                                        invisible="not skill_id"/>
+                            </group>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action for Recruitment Request Line -->
+    <record id="recruitment_request_line_action" model="ir.actions.act_window">
+        <field name="name">Job Lines</field>
+        <field name="res_model">recruitment.request.line</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="recruitment_request_line_list"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new job line
+            </p>
+        </field>
+    </record>
+
+    <record id="recruitment_request_line_action_view_list" model="ir.actions.act_window.view">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">list</field>
+        <field name="view_id" ref="recruitment_request_line_list"/>
+        <field name="act_window_id" ref="recruitment_request_line_action"/>
+    </record>
+
+    <record id="recruitment_request_line_action_view_form" model="ir.actions.act_window.view">
+        <field name="sequence" eval="2"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="recruitment_request_line_form"/>
+        <field name="act_window_id" ref="recruitment_request_line_action"/>
+    </record>
+
+</odoo>

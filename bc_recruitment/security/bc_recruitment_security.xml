@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="0">
+
+        <!-- Groups -->
+        <record id="group_bc_recruitment_user" model="res.groups">
+            <field name="name">BC Recruitment / User</field>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+        <record id="group_bc_recruitment_manager" model="res.groups">
+            <field name="name">BC Recruitment / Manager</field>
+            <field name="implied_ids" eval="[(4, ref('group_bc_recruitment_user'))]"/>
+        </record>
+
+        <!-- Record Rules -->
+
+        <!-- Workers: Users can see all workers -->
+        <record id="bc_worker_rule_user" model="ir.rule">
+            <field name="name">BC Worker: User Access</field>
+            <field name="model_id" ref="model_bc_worker"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_bc_recruitment_user'))]"/>
+        </record>
+
+        <!-- Job Orders: Users can see all job orders -->
+        <record id="bc_job_order_rule_user" model="ir.rule">
+            <field name="name">BC Job Order: User Access</field>
+            <field name="model_id" ref="model_bc_job_order"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_bc_recruitment_user'))]"/>
+        </record>
+
+        <!-- Placements: Users can see all placements -->
+        <record id="bc_placement_rule_user" model="ir.rule">
+            <field name="name">BC Placement: User Access</field>
+            <field name="model_id" ref="model_bc_placement"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_bc_recruitment_user'))]"/>
+        </record>
+
+        <!-- Worker Skills: All users can see -->
+        <record id="bc_worker_skill_rule_all" model="ir.rule">
+            <field name="name">BC Worker Skill: All Users</field>
+            <field name="model_id" ref="model_bc_worker_skill"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+
+    </data>
+</odoo>

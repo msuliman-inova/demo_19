@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Inherit Partner Form View -->
+    <record id="view_partner_form_bc_recruitment" model="ir.ui.view">
+        <field name="name">res.partner.form.bc.recruitment</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+
+            <!-- Add Job Orders and Placements buttons in button box -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_job_orders" type="object" class="oe_stat_button"
+                        icon="fa-briefcase" invisible="job_order_count == 0">
+                    <field name="job_order_count" widget="statinfo" string="Job Orders"/>
+                </button>
+                <button name="action_view_placements" type="object" class="oe_stat_button"
+                        icon="fa-users" invisible="placement_count == 0">
+                    <field name="placement_count" widget="statinfo" string="Placements"/>
+                </button>
+            </xpath>
+
+            <!-- Add BC Client checkbox in Sales & Purchase section -->
+            <xpath expr="//page[@name='sales_purchases']//group" position="inside">
+                <group string="Blue Collar Recruitment" name="bc_recruitment">
+                    <field name="is_bc_client"/>
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+
+</odoo>

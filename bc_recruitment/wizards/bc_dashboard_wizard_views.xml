@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- BC Dashboard Wizard Form View -->
+    <record id="view_bc_dashboard_wizard_form" model="ir.ui.view">
+        <field name="name">bc.dashboard.wizard.form</field>
+        <field name="model">bc.dashboard.wizard</field>
+        <field name="arch" type="xml">
+            <form string="BC Recruitment Dashboard">
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sales" type="object" class="oe_stat_button" icon="fa-shopping-cart">
+                            <field name="sales_count" widget="statinfo" string="Sales Orders"/>
+                        </button>
+                        <button name="action_view_purchases" type="object" class="oe_stat_button" icon="fa-shopping-basket"
+                                invisible="purchase_count == 0">
+                            <field name="purchase_count" widget="statinfo" string="Purchases"/>
+                        </button>
+                        <button name="action_view_jobs" type="object" class="oe_stat_button" icon="fa-briefcase"
+                                invisible="job_count == 0">
+                            <field name="job_count" widget="statinfo" string="Job Orders"/>
+                        </button>
+                        <button name="action_view_customer_invoices" type="object" class="oe_stat_button" icon="fa-file-text-o"
+                                invisible="customer_invoice_count == 0">
+                            <field name="customer_invoice_count" widget="statinfo" string="Invoices"/>
+                        </button>
+                        <button name="action_view_vendor_bills" type="object" class="oe_stat_button" icon="fa-file-text"
+                                invisible="vendor_invoice_count == 0">
+                            <field name="vendor_invoice_count" widget="statinfo" string="Vendor Bills"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="sale_order_id" readonly="1" class="oe_inline"/>
+                        </h1>
+                        <h3 invisible="not project_id">
+                            Project: <field name="project_id" readonly="1" class="oe_inline"/>
+                        </h3>
+                    </div>
+
+                    <group>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+
+                    <!-- Financial Overview Cards -->
+                    <div class="row mt16">
+                        <!-- Sales Income Card -->
+                        <div class="col-12 col-lg-6 mb-3">
+                            <div class="alert alert-success" role="status" style="margin-bottom: 0; height: 100%;">
+                                <h4 class="alert-heading">
+                                    <i class="fa fa-money"/> Sales Income
+                                </h4>
+                                <hr/>
+                                <table class="table table-sm table-borderless" style="margin-bottom: 0;">
+                                    <tr>
+                                        <td><strong>Total Expected:</strong></td>
+                                        <td class="text-end"><field name="total_sales_amount" widget="monetary" readonly="1" nolabel="1"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Invoiced:</strong></td>
+                                        <td class="text-end"><field name="total_invoiced_sales" widget="monetary" readonly="1" nolabel="1"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Uninvoiced:</strong></td>
+                                        <td class="text-end"><field name="total_uninvoiced_sales" widget="monetary" readonly="1" nolabel="1"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Purchase Expenses Card -->
+                        <div class="col-12 col-lg-6 mb-3">
+                            <div class="alert alert-warning" role="status" style="margin-bottom: 0; height: 100%;">
+                                <h4 class="alert-heading">
+                                    <i class="fa fa-shopping-basket"/> Purchase Expenses
+                                </h4>
+                                <hr/>
+                                <table class="table table-sm table-borderless" style="margin-bottom: 0;">
+                                    <tr>
+                                        <td><strong>Total Expected:</strong></td>
+                                        <td class="text-end"><field name="total_purchase_amount" widget="monetary" readonly="1" nolabel="1"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Invoiced:</strong></td>
+                                        <td class="text-end"><field name="total_invoiced_purchase" widget="monetary" readonly="1" nolabel="1"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Uninvoiced:</strong></td>
+                                        <td class="text-end"><field name="total_uninvoiced_purchase" widget="monetary" readonly="1" nolabel="1"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profit & Loss Overview -->
+                    <separator string="Profit &amp; Loss Overview" class="mt16"/>
+                    <div class="row">
+                        <div class="col-12 col-lg-4 mb-3">
+                            <div class="alert alert-info text-center" role="status" style="height: 100%;">
+                                <h5><i class="fa fa-line-chart"/> Expected Margin</h5>
+                                <h2 class="mt-3 mb-3">
+                                    <field name="expected_margin" widget="monetary" readonly="1" nolabel="1"/>
+                                </h2>
+                                <p class="text-muted mb-0">Based on total sales - total purchases</p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4 mb-3">
+                            <div class="alert alert-primary text-center" role="status" style="height: 100%;">
+                                <h5><i class="fa fa-money"/> Actual Margin (Invoiced)</h5>
+                                <h2 class="mt-3 mb-3">
+                                    <field name="actual_margin" widget="monetary" readonly="1" nolabel="1"/>
+                                </h2>
+                                <p class="text-muted mb-0">Based on invoiced amounts</p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-4 mb-3">
+                            <div class="alert alert-success text-center" role="status" style="height: 100%;">
+                                <h5><i class="fa fa-percent"/> Margin Percentage</h5>
+                                <h2 class="mt-3 mb-3">
+                                    <field name="margin_percentage" widget="percentage" readonly="1" nolabel="1"/>
+                                </h2>
+                                <p class="text-muted mb-0">Profit margin on sales</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Related Sales Orders -->
+                    <separator string="Related Sales Orders" class="mt16"/>
+                    <field name="sale_order_ids" nolabel="1">
+                        <list decoration-success="state == 'sale'" decoration-info="state == 'draft'">
+                            <field name="name" string="Order Reference"/>
+                            <field name="partner_id" string="Customer"/>
+                            <field name="partner_is_customer" string="Is Customer"/>
+                            <field name="partner_is_agency" string="Is Agency"/>
+                            <field name="date_order" string="Order Date"/>
+                            <field name="state" string="Status" widget="badge" decoration-success="state == 'sale'" decoration-info="state in ['draft', 'sent']"/>
+                            <field name="amount_untaxed" string="Untaxed Amount" widget="monetary"/>
+                            <field name="amount_total" string="Total" widget="monetary"/>
+                            <field name="invoice_status" string="Invoice Status" widget="badge" decoration-success="invoice_status == 'invoiced'" decoration-warning="invoice_status == 'to invoice'"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
+
+                    <!-- Related Purchase Orders -->
+                    <separator string="Related Purchase Orders" class="mt16"/>
+                    <field name="purchase_order_ids" nolabel="1">
+                        <list decoration-success="state == 'purchase'" decoration-info="state == 'draft'">
+                            <field name="name" string="Order Reference"/>
+                            <field name="partner_id" string="Vendor"/>
+                            <field name="partner_is_customer" string="Is Customer"/>
+                            <field name="partner_is_agency" string="Is Agency"/>
+                            <field name="date_order" string="Order Date"/>
+                            <field name="state" string="Status" widget="badge" decoration-success="state == 'purchase'" decoration-info="state in ['draft', 'sent']"/>
+                            <field name="amount_untaxed" string="Untaxed Amount" widget="monetary"/>
+                            <field name="amount_total" string="Total" widget="monetary"/>
+                            <field name="invoice_status" string="Invoice Status" widget="badge" decoration-success="invoice_status == 'invoiced'" decoration-warning="invoice_status == 'to invoice'"/>
+                            <field name="currency_id" column_invisible="1"/>
+                        </list>
+                    </field>
+
+                    <!-- Job Orders Overview -->
+                    <separator string="Job Orders Overview" class="mt16" invisible="job_count == 0"/>
+                    <div class="row" invisible="job_count == 0">
+                        <!-- Positions Requested Card -->
+                        <div class="col-12 col-lg-3 mb-3">
+                            <div class="alert alert-info text-center" role="status" style="height: 100%;">
+                                <h6><i class="fa fa-users"/> Positions Requested</h6>
+                                <h1 class="display-4 text-primary mt-3 mb-3">
+                                    <field name="total_positions_requested" readonly="1" nolabel="1"/>
+                                </h1>
+                                <p class="text-muted mb-0 small">Workers needed</p>
+                            </div>
+                        </div>
+
+                        <!-- Positions Filled Card -->
+                        <div class="col-12 col-lg-3 mb-3">
+                            <div class="alert alert-success text-center" role="status" style="height: 100%;">
+                                <h6><i class="fa fa-check-circle"/> Positions Filled</h6>
+                                <h1 class="display-4 text-success mt-3 mb-3">
+                                    <field name="total_positions_filled" readonly="1" nolabel="1"/>
+                                </h1>
+                                <p class="text-muted mb-0 small">Workers placed</p>
+                            </div>
+                        </div>
+
+                        <!-- Fill Rate Card -->
+                        <div class="col-12 col-lg-3 mb-3">
+                            <div class="alert alert-warning text-center" role="status" style="height: 100%;">
+                                <h6><i class="fa fa-pie-chart"/> Fill Rate</h6>
+                                <h1 class="display-4 text-warning mt-3 mb-3">
+                                    <field name="fill_rate" widget="percentage" readonly="1" nolabel="1"/>
+                                </h1>
+                                <p class="text-muted mb-0 small">Fulfillment progress</p>
+                            </div>
+                        </div>
+
+                        <!-- View Jobs Button Card -->
+                        <div class="col-12 col-lg-3 mb-3">
+                            <div class="alert alert-light text-center" role="status" style="height: 100%; display: flex; flex-direction: column; justify-content: center;">
+                                <h6 class="mb-3"><i class="fa fa-briefcase"/> Job Orders</h6>
+                                <button name="action_view_jobs" type="object" class="btn btn-primary">
+                                    <i class="fa fa-briefcase"/> View Details
+                                </button>
+                                <p class="text-muted mt-2 mb-0 small">
+                                    <field name="job_count" readonly="1" nolabel="1"/> job order(s)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                </sheet>
+
+                <footer>
+                    <button string="Close" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Inherit the website contact us page to replace subject text field with dropdown -->
+    <template id="contactus_custom" inherit_id="website.contactus" name="Contact Us - Custom Subject">
+        <!-- Change Subject field to 50% width -->
+        <xpath expr="//div[hasclass('s_website_form_field')][.//input[@id='contact5'][@name='subject']]" position="attributes">
+            <attribute name="class">mb-3 col-lg-6 s_website_form_field s_website_form_required s_website_form_model_required</attribute>
+        </xpath>
+
+        <!-- Replace the subject input field with a dropdown -->
+        <xpath expr="//input[@id='contact5'][@name='subject']" position="replace">
+            <select id="contact5" name="subject_id" class="form-control form-select s_website_form_input" required="required">
+                <option value="">Select Subject</option>
+                <t t-foreach="contact_subjects or []" t-as="subject">
+                    <option t-att-value="subject.id">
+                        <t t-esc="subject.name"/>
+                    </option>
+                </t>
+            </select>
+        </xpath>
+
+        <!-- Add additional fields before question/description field container -->
+        <xpath expr="//div[hasclass('s_website_form_field')][.//textarea[@id='contact6'][@name='description']]" position="before">
+            <!-- Country/Location -->
+            <div class="mb-3 col-lg-6 s_website_form_field s_website_form_custom" data-type="many2one" data-name="Field">
+                <label class="s_website_form_label" style="width: 200px" for="country_id">
+                    <span class="s_website_form_label_content">Country/Location</span>
+                </label>
+                <select name="country_id" class="form-control form-select s_website_form_input" id="country_id">
+                    <option value="">Select Country</option>
+                    <t t-foreach="countries or []" t-as="country">
+                        <option t-att-value="country.id" t-att-selected="'selected' if country.code == 'AE' else None">
+                            <t t-esc="country.name"/>
+                        </option>
+                    </t>
+                </select>
+            </div>
+
+            <!-- Preferred Contact Method -->
+            <div class="mb-3 col-lg-6 s_website_form_field s_website_form_custom" data-type="char" data-name="Field">
+                <label class="s_website_form_label" style="width: 200px" for="preferred_contact_method">
+                    <span class="s_website_form_label_content">Preferred Contact Method</span>
+                </label>
+                <select name="preferred_contact_method" class="form-control form-select s_website_form_input" id="preferred_contact_method">
+                    <option value="">Select Method</option>
+                    <option value="email">Email</option>
+                    <option value="phone">Phone</option>
+                    <option value="whatsapp">WhatsApp</option>
+                </select>
+            </div>
+
+            <!-- Best Time to Contact -->
+            <div class="mb-3 col-lg-6 s_website_form_field s_website_form_custom" data-type="char" data-name="Field">
+                <label class="s_website_form_label" style="width: 200px" for="best_time_to_contact">
+                    <span class="s_website_form_label_content">Best Time to Contact</span>
+                </label>
+                <select name="best_time_to_contact" class="form-control form-select s_website_form_input" id="best_time_to_contact">
+                    <option value="">Select Time</option>
+                    <option value="morning">Morning</option>
+                    <option value="afternoon">Afternoon</option>
+                    <option value="evening">Evening</option>
+                </select>
+            </div>
+        </xpath>
+    </template>
+</odoo>

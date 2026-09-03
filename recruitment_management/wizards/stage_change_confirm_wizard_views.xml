@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_stage_change_confirm_wizard_form" model="ir.ui.view">
+        <field name="name">stage.change.confirm.wizard.form</field>
+        <field name="model">stage.change.confirm.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirm Stage Change">
+                <group>
+                    <field name="lead_id" invisible="1"/>
+                    <field name="new_stage_id" invisible="1"/>
+                    <field name="message" nolabel="1" colspan="2" widget="text"/>
+                    <field name="assigned_employee_id" readonly="1"/>
+                </group>
+                <footer>
+                    <button name="action_confirm" string="Confirm &amp; Proceed" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

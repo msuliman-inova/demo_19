@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Default Recruitment Urgency Configuration -->
+        <record id="default_recruitment_urgency_config" model="recruitment.urgency.config">
+            <field name="name">Urgency Settings</field>
+            <field name="urgency_urgent_days">3</field>
+            <field name="urgency_attention_days">7</field>
+        </record>
+    </data>
+</odoo>

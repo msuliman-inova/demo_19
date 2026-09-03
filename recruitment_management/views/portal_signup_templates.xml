@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Portal Signup - User Type (Single Line + Other, default: Other) -->
+    <template id="portal_signup_user_type" name="Portal Signup - User Type"
+              inherit_id="auth_signup.signup">
+        <xpath expr="//t[@t-call='auth_signup.fields']" position="after">
+            <div class="mb-3 field-user_type">
+                <label class="form-label mb-0">I am a:</label>
+                <div class="form-check mb-0">
+                    <input type="radio" name="user_type" id="user_type_employee"
+                           value="employee" class="form-check-input"/>
+                    <label class="form-check-label" for="user_type_employee">
+                        Employee (Job Seeker)
+                    </label>
+                </div>
+                <div class="form-check mb-0">
+                    <input type="radio" name="user_type" id="user_type_employer"
+                           value="employer" class="form-check-input"/>
+                    <label class="form-check-label" for="user_type_employer">
+                         Employer (Hiring)
+                    </label>
+                </div>
+                <div class="form-check mb-0">
+                    <input type="radio" name="user_type" id="user_type_other"
+                           value="other" class="form-check-input" checked="checked"/>
+                    <label class="form-check-label" for="user_type_other">
+                        Other
+                    </label>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Portal My Account - Show User Type (Single Line + Other) -->
+    <template id="portal_my_account_user_type" name="Portal My Account - User Type"
+              inherit_id="portal.portal_my_details">
+        <xpath expr="//form" position="inside">
+            <div class="row mb-3">
+                <div class="col-lg-12 d-flex align-items-center gap-3">
+                    <h5 class="mb-0">Account Type:</h5>
+                    <div class="form-check mb-0">
+                        <input type="radio" name="user_type" id="user_type_employee"
+                               value="employee" class="form-check-input"
+                               t-att-checked="'checked' if partner_sudo.user_type == 'employee' else None"/>
+                        <label class="form-check-label" for="user_type_employee">
+                            Employee
+                        </label>
+                    </div>
+                    <div class="form-check mb-0">
+                        <input type="radio" name="user_type" id="user_type_employer"
+                               value="employer" class="form-check-input"
+                               t-att-checked="'checked' if partner_sudo.user_type == 'employer' else None"/>
+                        <label class="form-check-label" for="user_type_employer">
+                            Employer
+                        </label>
+                    </div>
+                    <div class="form-check mb-0">
+                        <input type="radio" name="user_type" id="user_type_other"
+                               value="other" class="form-check-input"
+                               t-att-checked="'checked' if partner_sudo.user_type in [None, 'other'] else None"/>
+                        <label class="form-check-label" for="user_type_other">
+                            Other
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

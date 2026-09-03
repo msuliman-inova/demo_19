@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Blue Collar Worker Skills -->
+        <record id="skill_construction" model="bc.worker.skill">
+            <field name="name">Construction</field>
+            <field name="description">General construction work including building, renovation, and site preparation</field>
+        </record>
+
+        <record id="skill_carpentry" model="bc.worker.skill">
+            <field name="name">Carpentry</field>
+            <field name="description">Woodworking, framing, and finishing work</field>
+        </record>
+
+        <record id="skill_welding" model="bc.worker.skill">
+            <field name="name">Welding</field>
+            <field name="description">Metal joining using various welding techniques</field>
+        </record>
+
+        <record id="skill_plumbing" model="bc.worker.skill">
+            <field name="name">Plumbing</field>
+            <field name="description">Installation and repair of water supply and drainage systems</field>
+        </record>
+
+        <record id="skill_electrical" model="bc.worker.skill">
+            <field name="name">Electrical Work</field>
+            <field name="description">Installation and maintenance of electrical systems</field>
+        </record>
+
+        <record id="skill_painting" model="bc.worker.skill">
+            <field name="name">Painting</field>
+            <field name="description">Interior and exterior painting and finishing</field>
+        </record>
+
+        <record id="skill_masonry" model="bc.worker.skill">
+            <field name="name">Masonry</field>
+            <field name="description">Bricklaying, stonework, and concrete work</field>
+        </record>
+
+        <record id="skill_hvac" model="bc.worker.skill">
+            <field name="name">HVAC</field>
+            <field name="description">Heating, ventilation, and air conditioning systems</field>
+        </record>
+
+        <record id="skill_roofing" model="bc.worker.skill">
+            <field name="name">Roofing</field>
+            <field name="description">Installation and repair of roofing systems</field>
+        </record>
+
+        <record id="skill_machine_operation" model="bc.worker.skill">
+            <field name="name">Machine Operation</field>
+            <field name="description">Operating heavy machinery and equipment</field>
+        </record>
+
+        <record id="skill_forklift" model="bc.worker.skill">
+            <field name="name">Forklift Operation</field>
+            <field name="description">Operating forklifts and material handling equipment</field>
+        </record>
+
+        <record id="skill_warehouse" model="bc.worker.skill">
+            <field name="name">Warehouse Operations</field>
+            <field name="description">Warehouse work including picking, packing, and inventory management</field>
+        </record>
+
+        <record id="skill_manufacturing" model="bc.worker.skill">
+            <field name="name">Manufacturing</field>
+            <field name="description">Production line work and assembly</field>
+        </record>
+
+        <record id="skill_landscaping" model="bc.worker.skill">
+            <field name="name">Landscaping</field>
+            <field name="description">Outdoor maintenance and landscape design implementation</field>
+        </record>
+
+        <record id="skill_cleaning" model="bc.worker.skill">
+            <field name="name">Cleaning</field>
+            <field name="description">Janitorial and cleaning services</field>
+        </record>
+
+        <record id="skill_security" model="bc.worker.skill">
+            <field name="name">Security</field>
+            <field name="description">Security guard and surveillance work</field>
+        </record>
+
+        <record id="skill_driving" model="bc.worker.skill">
+            <field name="name">Driving</field>
+            <field name="description">Professional driving including delivery and transportation</field>
+        </record>
+
+        <record id="skill_agriculture" model="bc.worker.skill">
+            <field name="name">Agriculture</field>
+            <field name="description">Farming and agricultural work</field>
+        </record>
+
+        <record id="skill_mechanic" model="bc.worker.skill">
+            <field name="name">Mechanic</field>
+            <field name="description">Vehicle and equipment maintenance and repair</field>
+        </record>
+
+        <record id="skill_food_service" model="bc.worker.skill">
+            <field name="name">Food Service</field>
+            <field name="description">Kitchen work and food preparation</field>
+        </record>
+
+    </data>
+</odoo>

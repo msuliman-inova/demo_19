@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Custom Portal Quotation Template with Conditional Price Display -->
+    <template id="portal_sale_order_custom_prices" name="Portal Sale Order - Custom Price Display" inherit_id="sale.sale_order_portal_content">
+
+        <!-- Hide Unit Price header when show_prices is False -->
+        <xpath expr="//th[@id='product_unit_price_header']" position="attributes">
+            <attribute name="t-if">sale_order.show_prices</attribute>
+        </xpath>
+
+        <!-- Hide Taxes header when show_prices is False -->
+        <xpath expr="//th[@id='taxes_header']" position="attributes">
+            <attribute name="t-if">sale_order.show_prices and display_taxes</attribute>
+        </xpath>
+
+        <!-- Hide Amount/Subtotal header when show_prices is False -->
+        <xpath expr="//th[@id='subtotal_header']" position="attributes">
+            <attribute name="t-if">sale_order.show_prices</attribute>
+        </xpath>
+
+        <!-- Add Fee % column header after Quantity (when prices shown) -->
+        <xpath expr="//th[@id='product_qty_header']" position="after">
+            <th t-if="sale_order.show_prices" class="text-end" id="fee_percentage_header">
+                <span>Fee %</span>
+            </th>
+        </xpath>
+
+        <!-- Find the regular line and add fee_percentage column -->
+        <xpath expr="//td[@name='td_combo_quantity']" position="before">
+            <!-- This is a marker to find the tr, we'll add our td after quantity td in next xpath -->
+        </xpath>
+
+        <!-- Add custom styling and message when prices are hidden -->
+        <xpath expr="//div[@name='sol_table']" position="before">
+            <div t-if="not sale_order.show_prices" class="alert alert-info text-center mb-4">
+                <i class="fa fa-info-circle fa-2x mb-2"/>
+                <h5 class="mb-2"><strong>Price Information Available Upon Request</strong></h5>
+                <p class="mb-0">Please contact us for detailed pricing information and custom quotes.</p>
+            </div>
+        </xpath>
+
+        <!-- Hide totals section completely when show_prices is False -->
+        <xpath expr="//t[@t-call='sale.sale_order_portal_content_totals_table']" position="attributes">
+            <attribute name="t-if">sale_order.show_prices</attribute>
+        </xpath>
+
+    </template>
+
+    <!-- Customize the order lines to hide prices in individual cells -->
+    <template id="portal_sale_order_line_custom_prices" name="Portal Sale Line - Custom Prices" inherit_id="sale.sale_order_portal_content">
+
+        <!-- We need to replace the main line rendering to handle price visibility -->
+        <xpath expr="//tr[hasclass('o_line_section')]" position="after">
+            <!-- Inject custom handling for regular lines -->
+        </xpath>
+
+    </template>
+
+    <!-- Override the template to properly handle cell visibility -->
+    <template id="sale_order_portal_content_inherit_custom" inherit_id="sale.sale_order_portal_content">
+
+        <!-- Wrap the entire order lines table rendering -->
+        <xpath expr="//div[@name='sol_table']/table" position="replace">
+            <table t-att-data-order-id="sale_order.id" t-att-data-token="sale_order.access_token" class="table table-sm" id="sales_order_table">
+                <thead>
+                    <tr>
+                        <th class="text-start" id="product_name_header">Services</th>
+                        <th class="text-end" id="product_qty_header">Quantity</th>
+                        <th class="text-end" id="fee_percentage_header">
+                            <span>Fee %</span>
+                        </th>
+                        <th t-if="sale_order.show_prices" t-attf-class="text-end {{ 'd-none d-sm-table-cell' if report_type == 'html' else '' }}" id="product_unit_price_header">
+                            Unit Price
+                        </th>
+                        <th t-if="sale_order.show_prices and display_discount" t-attf-class="text-end {{ 'd-none d-sm-table-cell' if report_type == 'html' else '' }}" id="product_discount_header">
+                            <span>Disc.%</span>
+                        </th>
+                        <th t-if="sale_order.show_prices and display_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" id="taxes_header">
+                            <span>Taxes</span>
+                        </th>
+                        <th t-if="sale_order.show_prices" class="text-end" id="subtotal_header">
+                            <span>Amount</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="sale_tbody">
+                    <t t-foreach="lines_to_report" t-as="line">
+                        <t t-set="is_section" t-value="line.display_type == 'line_section'"/>
+                        <t t-set="is_note" t-value="line.display_type == 'line_note'"/>
+
+                        <!-- Section lines -->
+                        <tr t-if="is_section" class="fw-bolder o_line_section">
+                            <td colspan="99">
+                                <span t-field="line.name"/>
+                            </td>
+                        </tr>
+
+                        <!-- Note lines -->
+                        <tr t-elif="is_note" class="fst-italic o_line_note">
+                            <td colspan="99">
+                                <span t-field="line.name"/>
+                            </td>
+                        </tr>
+
+                        <!-- Regular product lines -->
+                        <tr t-else="">
+                            <!-- Product Name -->
+                            <td>
+                                <span t-field="line.name"/>
+                            </td>
+
+                            <!-- Quantity -->
+                            <td class="text-end">
+                                <span t-field="line.product_uom_qty"/>
+                                <span t-field="line.product_uom_id"/>
+                            </td>
+
+                            <!-- Fee Percentage -->
+                            <td class="text-end">
+                                <span t-if="line.fee_percentage" t-esc="'{:.2f}%'.format(line.fee_percentage)"/>
+                                <span t-else="">-</span>
+                            </td>
+
+                            <!-- Unit Price (only if show_prices) -->
+                            <td t-if="sale_order.show_prices" t-attf-class="text-end {{ 'd-none d-sm-table-cell' if report_type == 'html' else '' }}">
+                                <span t-field="line.price_unit" t-options="{'widget': 'monetary', 'display_currency': sale_order.currency_id}"/>
+                            </td>
+
+                            <!-- Discount (only if show_prices and has discount) -->
+                            <td t-if="sale_order.show_prices and display_discount" t-attf-class="text-end {{ 'd-none d-sm-table-cell' if report_type == 'html' else '' }}">
+                                <span t-if="line.discount and line.discount > 0"><t t-esc="int(line.discount)"/>%</span>
+                            </td>
+
+                            <!-- Taxes (only if show_prices and has taxes) -->
+                            <td t-if="sale_order.show_prices and display_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}">
+                                <span t-out="', '.join(line.tax_ids.mapped('name'))"/>
+                            </td>
+
+                            <!-- Subtotal (only if show_prices) -->
+                            <td t-if="sale_order.show_prices" class="text-end">
+                                <span t-field="line.price_subtotal" t-options="{'widget': 'monetary', 'display_currency': sale_order.currency_id}"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </xpath>
+
+    </template>
+
+    <!-- Hide sidebar prices when show_prices is False -->
+    <template id="sale_order_portal_sidebar_custom_prices" name="Portal Sidebar - Custom Prices" inherit_id="sale.sale_order_portal_template">
+
+        <!-- Hide the main title amount (Down payment or Total) -->
+        <xpath expr="//t[@t-set='title']" position="replace">
+            <t t-set="title">
+                <t t-if="sale_order.show_prices">
+                    <t t-if="sale_order.state in 'draft,sent' and sale_order.prepayment_percent != 1.0">
+                        <h4>Down payment</h4>
+                        <h2>
+                            <t
+                                t-out="sale_order._get_prepayment_required_amount()"
+                                t-options="{
+                                    'widget': 'monetary',
+                                    'display_currency': sale_order.currency_id,
+                                }"
+                            />
+                            (<t t-out="sale_order.prepayment_percent * 100"/>%)
+                        </h2>
+                    </t>
+                    <h2 t-else="" t-field="sale_order.amount_total" class="mb-0 text-break"/>
+                </t>
+                <t t-else="">
+                    <h4>Quotation</h4>
+                </t>
+            </t>
+        </xpath>
+
+        <!-- Hide amount paid alert when show_prices is False -->
+        <xpath expr="//div[hasclass('alert-success') and contains(text(), 'Amount paid')]" position="attributes">
+            <attribute name="t-if">sale_order.show_prices and 0 &lt; sale_order.amount_paid &lt; sale_order.amount_total and sale_order.state != 'cancel'</attribute>
+        </xpath>
+
+        <!-- Hide "Your advantage" section when show_prices is False -->
+        <xpath expr="//div[@name='sale_order_advantage']" position="attributes">
+            <attribute name="t-if">sale_order.show_prices and not sale_order.is_expired and sale_order.state in ['draft', 'sent'] and sale_order.amount_undiscounted - sale_order.amount_untaxed &gt; 0.01</attribute>
+        </xpath>
+
+    </template>
+
+    <!-- Override Portal Orders List to hide Total when show_prices is False and add Fee % column -->
+    <template id="portal_my_orders_custom" name="Portal My Orders - Custom Columns" inherit_id="sale.portal_my_orders">
+
+        <!-- Add Fee % column header after Order Date -->
+        <xpath expr="//th[hasclass('text-end')][1]" position="after">
+            <th class="text-end">Fee %</th>
+        </xpath>
+
+        <!-- Make Total column header conditional on show_prices -->
+        <xpath expr="//th[@name='order_total']" position="attributes">
+            <attribute name="t-if">any(order.show_prices for order in orders)</attribute>
+        </xpath>
+
+        <!-- Add Fee % column data after Order Date cell -->
+        <xpath expr="//td[hasclass('text-end')][1]" position="after">
+            <td class="text-end">
+                <t t-if="order.order_line">
+                    <t t-set="fee_values" t-value="[line.fee_percentage for line in order.order_line if line.fee_percentage]"/>
+                    <span t-if="fee_values">
+                        <t t-esc="'{:.2f}%'.format(sum(fee_values) / len(fee_values))"/>
+                    </span>
+                    <span t-else="">-</span>
+                </t>
+                <span t-else="">-</span>
+            </td>
+        </xpath>
+
+        <!-- Make Total cell conditional on show_prices -->
+        <xpath expr="//td[@name='order_amount_total']" position="attributes">
+            <attribute name="t-if">order.show_prices</attribute>
+        </xpath>
+
+    </template>
+
+    <!-- Override Portal Quotations List to hide Total when show_prices is False and add Fee % column -->
+    <template id="portal_my_quotations_custom" name="Portal My Quotations - Custom Columns" inherit_id="sale.portal_my_quotations">
+
+        <!-- Add Fee % column header after Quotation Date -->
+        <xpath expr="//th[hasclass('text-end')][1]" position="after">
+            <th class="text-end">Fee %</th>
+        </xpath>
+
+        <!-- Hide Total column header (it's the last th with text-end and contains "Total") -->
+        <xpath expr="//thead/tr/th[last()]" position="attributes">
+            <attribute name="t-if">any(quotation.show_prices for quotation in quotations)</attribute>
+        </xpath>
+
+        <!-- Add Fee % column data after Quotation Date cell -->
+        <xpath expr="//td[hasclass('text-end')][1]" position="after">
+            <td class="text-end">
+                <t t-if="quotation.order_line">
+                    <t t-set="fee_values" t-value="[line.fee_percentage for line in quotation.order_line if line.fee_percentage]"/>
+                    <span t-if="fee_values">
+                        <t t-esc="'{:.2f}%'.format(sum(fee_values) / len(fee_values))"/>
+                    </span>
+                    <span t-else="">-</span>
+                </t>
+                <span t-else="">-</span>
+            </td>
+        </xpath>
+
+        <!-- Make Total cell conditional on show_prices (it's the last td in each row) -->
+        <xpath expr="//t[@t-foreach='quotations']//tr/td[last()]" position="attributes">
+            <attribute name="t-if">quotation.show_prices</attribute>
+        </xpath>
+
+    </template>
+
+    <!-- Override signature dialog to show fee percentage instead of amount when show_prices is False -->
+    <template id="portal_sale_order_sign_custom" name="Portal Sale Order Sign - Custom" inherit_id="sale.sale_order_portal_sign_modal">
+
+        <!-- Replace the total amount with conditional display -->
+        <xpath expr="//main[@id='sign-dialog']/span" position="replace">
+            <span>
+                By signing, you confirm acceptance on behalf of
+                <b t-field="sale_order.partner_id.commercial_partner_id"/>
+                <t t-if="sale_order.show_prices">
+                    for the <b data-id="total_amount" t-field="sale_order.amount_total"/> quote.
+                </t>
+                <t t-else="">
+                    for the quote with
+                    <t t-if="sale_order.order_line">
+                        <t t-set="fee_values" t-value="[line.fee_percentage for line in sale_order.order_line if line.fee_percentage]"/>
+                        <b t-if="fee_values">
+                            <t t-esc="'{:.2f}%'.format(sum(fee_values) / len(fee_values))"/> fee percentage
+                        </b>
+                        <b t-else="">service fee</b>
+                    </t>
+                    <b t-else="">service fee</b>.
+                </t>
+            </span>
+        </xpath>
+
+    </template>
+
+</odoo>

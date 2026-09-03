@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Extend HR Applicant Form View -->
+    <record id="hr_applicant_view_form_inherit" model="ir.ui.view">
+        <field name="name">hr.applicant.form.inherit.time.to.fill</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+        <field name="arch" type="xml">
+            <!-- Add Time to Fill field after categ_ids -->
+            <xpath expr="//field[@name='categ_ids']" position="after">
+                <field name="time_to_fill_date"/>
+                <field name="guarantee_period_end"/>
+                <field name="post_hire_reminder_created" invisible="1"/>
+                <field name="days_remaining" invisible="1"/>
+                <field name="urgency_status" invisible="1"/>
+                <field name="is_under_guarantee" invisible="1"/>
+                <field name="guarantee_days_remaining" invisible="1"/>
+            </xpath>
+
+            <!-- Add Resume/CV attachment field after categ_ids -->
+            <xpath expr="//field[@name='categ_ids']" position="after">
+                <label for="resume_attachment" string="Resume/CV"/>
+                <div class="o_row">
+                    <field name="resume_filename" invisible="1"/>
+                    <field name="resume_attachment" filename="resume_filename"
+                           widget="binary"
+                           class="oe_inline"
+                           options="{'accepted_file_extensions': '.pdf,.doc,.docx'}"/>
+                    <div class="text-muted" style="font-size: 0.85em;">
+                        <i class="fa fa-info-circle"/>
+                        Can be automatically filled when applications are received from platform
+                    </div>
+                </div>
+            </xpath>
+
+            <!-- Add Contract Salary in Salary Package group -->
+            <xpath expr="//group[@name='recruitment_contract']" position="inside">
+                <label for="contract_salary" string="Contract Salary"/>
+                <div>
+                    <div class="o_row">
+                        <field name="contract_salary" placeholder="Actual contract salary"/>
+                    </div>
+                    <div class="text-muted" style="font-size: 0.85em;">
+                        <i class="fa fa-info-circle"/>
+                        Required for invoice calculation (Fee = Contract Salary × Percentage)
+                    </div>
+                </div>
+            </xpath>
+
+            <!-- Add Interview Recording section -->
+            <xpath expr="//page[@name='application_details']" position="after">
+                <page string="Interview Details" name="interview_details">
+                    <group>
+                        <group string="Meeting Information">
+                            <field name="interview_platform"/>
+                            <field name="interview_date"/>
+                            <label for="interview_meeting_url"/>
+                            <div class="o_row">
+                                <field name="interview_meeting_url" placeholder="https://zoom.us/j/..."
+                                       class="oe_inline"/>
+                                <button name="action_open_meeting_link" type="object"
+                                        string="Join Meeting"
+                                        class="btn-link"
+                                        icon="fa-external-link"
+                                        invisible="not interview_meeting_url"/>
+                            </div>
+                        </group>
+                        <group string="Recording Storage">
+                            <label for="google_drive_folder_url"/>
+                            <div class="o_row">
+                                <field name="google_drive_folder_url"
+                                       placeholder="https://drive.google.com/drive/folders/..." class="oe_inline"/>
+                                <button name="action_open_google_drive_folder" type="object"
+                                        string="Open Folder"
+                                        class="btn-link"
+                                        icon="fa-folder-open"
+                                        invisible="not google_drive_folder_url"/>
+                            </div>
+                            <field name="google_drive_recording_urls"
+                                   placeholder="Paste Google Drive recording links here (one per line)&#10;Example:&#10;https://drive.google.com/file/d/xxx/view&#10;https://drive.google.com/file/d/yyy/view"
+                                   widget="text"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="interview_notes"
+                               placeholder="Add interview notes, observations, and evaluation here..."/>
+                    </group>
+
+                    <group string="Interview Result Document">
+                        <label for="interview_result_attachment" string="Interview Result"/>
+                        <div class="o_row">
+                            <field name="interview_result_filename" invisible="1"/>
+                            <field name="interview_result_attachment" filename="interview_result_filename"
+                                   widget="binary"
+                                   class="oe_inline"
+                                   options="{'accepted_file_extensions': '.pdf,.doc,.docx'}"/>
+                            <div class="text-muted" style="font-size: 0.85em;">
+                                <i class="fa fa-info-circle"/>
+                                Upload interview assessment or result report to share with client
+                            </div>
+                        </div>
+                    </group>
+
+                    <group>
+                        <group string="Share with Client" col="1">
+                            <field name="interview_share_enabled" widget="boolean_toggle"/>
+                            <field name="interview_access_token" invisible="1"/>
+
+                            <!-- ✅ Added role="status" -->
+                            <div class="alert alert-info" role="status" invisible="not interview_share_enabled">
+                                <p>
+                                    <strong>
+                                        <i class="fa fa-info-circle"/>
+                                        Interview Sharing Enabled
+                                    </strong>
+                                </p>
+                                <p>Share this secure link with your client:</p>
+                                <field name="interview_share_url" readonly="1" widget="url"/>
+                                <div class="mt-2">
+                                    <button name="action_copy_interview_link" type="object"
+                                            string="Show Link"
+                                            class="btn btn-primary"
+                                            icon="fa-clipboard"/>
+                                    <button name="action_toggle_interview_sharing" type="object"
+                                            string="Disable Sharing"
+                                            class="btn btn-warning ms-2"
+                                            confirm="Are you sure you want to disable interview sharing? The current link will no longer work."
+                                            icon="fa-ban"/>
+                                </div>
+                            </div>
+
+                            <!-- ✅ Added role="alert" -->
+                            <div class="alert alert-warning" role="alert" invisible="interview_share_enabled">
+                                <p>
+                                    <i class="fa fa-lock"/>
+                                    Interview details are private
+                                </p>
+                                <button name="action_toggle_interview_sharing" type="object"
+                                        string="Enable Sharing"
+                                        class="btn btn-success"
+                                        icon="fa-share-alt"/>
+                            </div>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+            <!-- Add urgency status widget at the top -->
+            <xpath expr="//sheet/div[hasclass('oe_button_box')]" position="after">
+                <div class="oe_title mb-3">
+                    <!-- Overdue Alert - Red -->
+                    <div class="o_notification_alert text-white text-center p-2 rounded"
+                         style="background-color: #dc3545;"
+                         invisible="urgency_status != 'overdue'">
+                        <i class="fa fa-exclamation-triangle fa-lg me-2" title="Warning"/>
+                        <strong>Hiring Deadline Passed!</strong>
+                        -
+                        Customer needs to make hiring decision now
+                    </div>
+
+                    <!-- Urgent Alert - Orange -->
+                    <div class="o_notification_alert text-white text-center p-2 rounded"
+                         style="background-color: #fd7e14;"
+                         invisible="urgency_status != 'urgent'">
+                        <i class="fa fa-fire fa-lg me-2" title="Urgent"/>
+                        <strong>Hiring Deadline Approaching!</strong>
+                        -
+                        Only
+                        <field name="days_remaining" class="fw-bold" nolabel="1" widget="integer"/>
+                        day(s) remaining for customer decision
+                    </div>
+
+                    <!-- Attention Alert - Yellow -->
+                    <div class="o_notification_alert text-dark text-center p-2 rounded"
+                         style="background-color: #ffc107;"
+                         invisible="urgency_status != 'attention'">
+                        <i class="fa fa-clock-o fa-lg me-2" title="Time"/>
+                        <strong>Candidate Ready for Review</strong>
+                        -
+                        <field name="days_remaining" class="fw-bold" nolabel="1" widget="integer"/>
+                        day(s) remaining for customer to review
+                    </div>
+
+                    <!-- Guarantee Period Alert - Blue/Info -->
+                    <div class="o_notification_alert text-white text-center p-2 rounded mt-2"
+                         style="background-color: #17a2b8;"
+                         invisible="not is_under_guarantee">
+                        <i class="fa fa-shield fa-lg me-2" title="Guarantee"/>
+                        <strong>Replacement Guarantee Active</strong>
+                        -
+                        <field name="guarantee_days_remaining" class="fw-bold" nolabel="1" widget="integer"/>
+                        day(s) remaining
+                        (Until<field name="guarantee_period_end" nolabel="1" widget="date"/>)
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Extend HR Applicant Tree View -->
+    <record id="hr_applicant_view_tree_inherit" model="ir.ui.view">
+        <field name="name">hr.applicant.tree.inherit.time.to.fill</field>
+        <field name="model">hr.applicant</field>
+        <field name="inherit_id" ref="hr_recruitment.crm_case_tree_view_job"/>
+        <field name="arch" type="xml">
+            <!-- Add Time to Fill columns -->
+            <xpath expr="//field[@name='stage_id']" position="after">
+                <field name="time_to_fill_date" optional="show"/>
+                <field name="days_remaining" optional="show"/>
+                <field name="urgency_status" optional="show" widget="badge"
+                       decoration-danger="urgency_status == 'overdue'"
+                       decoration-warning="urgency_status == 'urgent'"
+                       decoration-info="urgency_status == 'attention'"
+                       decoration-success="urgency_status == 'normal'"/>
+                <field name="guarantee_period_end" optional="show"/>
+                <field name="guarantee_days_remaining" optional="show"/>
+                <field name="is_under_guarantee" optional="show" widget="boolean_toggle"/>
+                <field name="contract_salary" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

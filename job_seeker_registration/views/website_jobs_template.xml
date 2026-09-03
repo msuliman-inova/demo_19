@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add CSS to hide recruiter sidebar on thank you page -->
+    <template id="thankyou_hide_recruiter_css" name="Hide Recruiter Sidebar CSS" inherit_id="website.layout">
+        <xpath expr="//head" position="inside">
+            <style>
+                /* Hide recruiter contact information sidebar on thank you page */
+                #jobs_thankyou .row.pt24.pb24 > .col-lg-4.align-self-center {
+                    display: none !important;
+                }
+                /* Make the main content full width */
+                #jobs_thankyou .row.pt24.pb24 > .col.pt24.pb24.text-center {
+                    flex: 0 0 100%;
+                    max-width: 100%;
+                }
+            </style>
+        </xpath>
+    </template>
+
+    <!-- Add Filters Bar -->
+    <template id="jobs_filters_bar" inherit_id="website_hr_recruitment.index" name="Jobs Filters Bar">
+        <xpath expr="//div[@id='jobs_grid']" position="before">
+            <div class="col-12 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title mb-3">
+                            <i class="fa fa-filter"/> Filter Jobs
+                        </h5>
+                        <form method="get" action="/jobs" id="jobs_filter_form">
+                            <div class="row g-3">
+                                <!-- Department Filter -->
+                                <div class="col-md-4">
+                                    <label for="department_filter" class="form-label">
+                                        <i class="fa fa-sitemap"/> Department
+                                    </label>
+                                    <select name="department_id" id="department_filter" class="form-select" onchange="this.form.submit()">
+                                        <option value="">All Departments</option>
+                                        <t t-foreach="all_departments or []" t-as="dept">
+                                            <option t-att-value="dept.id" t-att-selected="'selected' if selected_department == dept.id else None">
+                                                <t t-out="dept.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+
+                                <!-- Contract Type Filter -->
+                                <div class="col-md-4">
+                                    <label for="contract_type_filter" class="form-label">
+                                        <i class="fa fa-suitcase"/> Contract Type
+                                    </label>
+                                    <select name="contract_type_id" id="contract_type_filter" class="form-select" onchange="this.form.submit()">
+                                        <option value="">All Contract Types</option>
+                                        <t t-foreach="all_contract_types or []" t-as="contract">
+                                            <option t-att-value="contract.id" t-att-selected="'selected' if selected_contract_type == contract.id else None">
+                                                <t t-out="contract.name"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+
+                                <!-- Location Filter -->
+                                <!--<div class="col-md-4">
+                                    <label for="location_filter" class="form-label">
+                                        <i class="fa fa-map-marker"/> Location
+                                    </label>
+                                    <select name="office_id" id="location_filter" class="form-select" onchange="this.form.submit()">
+                                        <option value="">All Locations</option>
+                                        <t t-foreach="all_offices or []" t-as="office">
+                                            <option t-att-value="office.id" t-att-selected="'selected' if selected_office == office.id else None">
+                                                <t t-if="office.city">
+                                                    <t t-out="office.city"/>
+                                                    <t t-if="office.country_id">, <t t-out="office.country_id.name"/></t>
+                                                </t>
+                                                <t t-else="">
+                                                    <t t-out="office.name or 'Unknown'"/>
+                                                </t>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>-->
+                            </div>
+
+                            <!-- Clear Filters Button -->
+                            <div class="row mt-3" t-if="selected_department or selected_contract_type or selected_office">
+                                <div class="col-12">
+                                    <a href="/jobs" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fa fa-times"/> Clear All Filters
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Add search counter and results info -->
+    <!--<template id="jobs_search_info" inherit_id="website_hr_recruitment.index" name="Jobs Search Info">
+        <xpath expr="//div[@id='jobs_grid']" position="before">
+            <div class="col-12 mb-3" t-if="jobs">
+                <div class="alert alert-info mb-0" role="alert">
+                    <i class="fa fa-info-circle"/>
+                    <strong>
+                        <t t-if="search">
+                            Found <t t-out="search_count"/> position<t t-if="search_count != 1">s</t> matching "<t t-out="search"/>"
+                        </t>
+                        <t t-else="">
+                            Showing <t t-out="search_count"/> available position<t t-if="search_count != 1">s</t>
+                        </t>
+                    </strong>
+                </div>
+            </div>
+        </xpath>
+    </template>-->
+
+    <!-- Enhanced job cards with better styling and information -->
+    <template id="jobs_list_apply_button" inherit_id="website_hr_recruitment.index" name="Jobs List Apply Button">
+        <!-- Replace the entire card link with a clickable card -->
+        <xpath expr="//div[@t-foreach='jobs']//a[@t-attf-href='/jobs/#{ slug(job) }']" position="replace">
+            <a t-attf-href="/jobs/#{ slug(job) }" class="text-decoration-none text-reset">
+                <div class="card-body p-4 border-start border-primary border-4">
+                    <div class="mt0 d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h3 class="mb-2" t-field="job.name"/>
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                <span t-if="not job.website_published" class="badge text-bg-danger">
+                                    <i class="fa fa-eye-slash"/> Unpublished
+                                </span>
+                                <span t-if="job.no_of_recruitment >= 1" class="badge text-bg-success">
+                                    <i class="fa fa-users"/>
+                                    <span t-field="job.no_of_recruitment"/>
+                                    <t t-if="job.no_of_recruitment == 1"> Position</t>
+                                    <t t-else=""> Positions</t>
+                                </span>
+                                <span t-if="job.create_date" class="badge text-bg-info">
+                                    <i class="fa fa-calendar"/> Posted <t t-out="(datetime.datetime.now() - job.create_date).days"/> days ago
+                                </span>
+                                <span t-if="job.application_count" class="badge text-bg-warning">
+                                    <i class="fa fa-user-plus"/>
+                                    <t t-out="job.application_count"/>
+                                    <t t-if="job.application_count == 1"> Applicant</t>
+                                    <t t-else=""> Applicants</t>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <t t-set="job_desc_edition_placeholder">Insert a Job Description...</t>
+                    <div t-attf-id="job_desc_{{job.id}}" class="job-description-wrapper mb-3">
+                        <div class="job-description-content text-muted" style="max-height: 100px; overflow: hidden; position: relative;">
+                            <div class="oe_empty" t-field="job.description" t-att-data-editor-message="job_desc_edition_placeholder"/>
+                            <div class="job-description-fade" style="position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,1));"/>
+                        </div>
+                        <span class="btn btn-sm btn-link p-0 text-decoration-none view-more-btn" t-attf-onclick="toggleJobDescription(event, {{job.id}}); return false;">
+                            <i class="fa fa-chevron-down"/> View More
+                        </span>
+                    </div>
+
+                    <div class="o_job_infos d-flex flex-wrap gap-3 mb-3 text-muted">
+                        <div class="d-inline-flex align-items-center">
+                            <i class="fa fa-map-marker fa-fw text-primary me-1"/>
+                            <span class="fw-light">
+                                <t t-if="job.address_id">
+                                    Onsite
+                                    <t t-if="job.address_id.city">
+                                        - <t t-out="job.address_id.city"/>
+                                        <t t-if="job.address_id.country_id">, <t t-out="job.address_id.country_id.name"/></t>
+                                    </t>
+                                </t>
+                                <t t-else="">Remote</t>
+                            </span>
+                        </div>
+                        <div t-if="job.department_id" class="d-inline-flex align-items-center">
+                            <i class="fa fa-sitemap fa-fw text-primary me-1"/>
+                            <span t-field="job.department_id" class="fw-light" t-options='{"fields": ["name"], "no_tag_br": True}'/>
+                        </div>
+                        <div t-if="job.contract_type_id" class="d-inline-flex align-items-center">
+                            <i class="fa fa-suitcase fa-fw text-primary me-1"/>
+                            <span t-field="job.contract_type_id" class="fw-light"/>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <small class="text-muted" t-if="job.company_id">
+                            <i class="fa fa-building-o"/> <span t-field="job.company_id"/>
+                        </small>
+                    </div>
+                </div>
+            </a>
+        </xpath>
+    </template>
+
+    <!-- Add empty state when no jobs found -->
+    <template id="jobs_empty_state" inherit_id="website_hr_recruitment.index" name="Jobs Empty State">
+        <xpath expr="//div[@id='jobs_grid']" position="inside">
+            <div t-if="not jobs" class="col-12 text-center py-5">
+                <i class="fa fa-briefcase fa-5x text-muted mb-4"/>
+                <h3 class="text-muted">No positions available at the moment</h3>
+                <p class="lead text-muted">
+                    <t t-if="search">
+                        We couldn't find any positions matching "<t t-out="search"/>".
+                    </t>
+                    <t t-else="">
+                        Check back soon or register your interest below to be notified when new positions open up.
+                    </t>
+                </p>
+                <div class="mt-4">
+                    <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#jobSeekerModal">
+                        <i class="fa fa-user-plus"/> Register Your Interest
+                    </button>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Add "Register Interest" button to jobs page -->
+    <template id="jobs_register_interest_button" inherit_id="website_hr_recruitment.index" name="Job Seeker Registration Button">
+        <xpath expr="//div[hasclass('container')]" position="inside">
+            <div class="row mt-5 mb-5">
+                <div class="col-lg-12 text-center">
+                    <div class="alert alert-info" role="alert">
+                        <h4 class="alert-heading">Can't find a suitable position?</h4>
+                        <p>Register your interest and we'll contact you when a matching position becomes available.</p>
+                        <hr/>
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#jobSeekerModal">
+                            <i class="fa fa-user-plus"/> Register Your Interest
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Job Seeker Registration Modal -->
+    <template id="job_seeker_registration_modal" inherit_id="website_hr_recruitment.index" name="Job Seeker Registration Modal">
+        <xpath expr="//div[@id='wrap']" position="inside">
+            <!-- Modal -->
+            <div class="modal fade" id="jobSeekerModal" tabindex="-1" aria-labelledby="jobSeekerModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="jobSeekerModalLabel">Register Your Interest</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form action="/job-seeker/register" method="post" enctype="multipart/form-data">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="seeker_name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="seeker_name" name="name" required="required"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="seeker_email" class="form-label">Email <span class="text-danger">*</span></label>
+                                        <input type="email" class="form-control" id="seeker_email" name="email" required="required"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="seeker_phone" class="form-label">Phone</label>
+                                        <input type="tel" class="form-control" id="seeker_phone" name="phone"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="seeker_mobile" class="form-label">Mobile</label>
+                                        <input type="tel" class="form-control" id="seeker_mobile" name="mobile"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="seeker_position" class="form-label">Desired Position <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" id="seeker_position" name="job_position" required="required" placeholder="e.g., Software Developer"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="seeker_department" class="form-label">Department</label>
+                                        <select class="form-control form-select" id="seeker_department" name="department_id">
+                                            <option value="">Select Department</option>
+                                            <t t-foreach="departments or []" t-as="dept">
+                                                <option t-att-value="dept.id"><t t-esc="dept.name"/></option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="seeker_experience" class="form-label">Years of Experience</label>
+                                        <input type="number" class="form-control" id="seeker_experience" name="experience_years" min="0"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="seeker_salary" class="form-label">Expected Salary</label>
+                                        <input type="number" class="form-control" id="seeker_salary" name="expected_salary" min="0" step="0.01"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="seeker_availability" class="form-label">Available From</label>
+                                        <input type="date" class="form-control" id="seeker_availability" name="availability_date"/>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="seeker_degree" class="form-label">Education Level</label>
+                                        <select class="form-control form-select" id="seeker_degree" name="degree_id">
+                                            <option value="">Select Degree</option>
+                                            <t t-foreach="degrees or []" t-as="degree">
+                                                <option t-att-value="degree.id"><t t-esc="degree.name"/></option>
+                                            </t>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="seeker_resume" class="form-label">Resume/CV <span class="text-danger">*</span></label>
+                                    <input type="file" class="form-control" id="seeker_resume" name="resume" accept=".pdf,.doc,.docx" required="required"/>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="seeker_cover_letter" class="form-label">Cover Letter / Additional Information</label>
+                                    <textarea class="form-control" id="seeker_cover_letter" name="cover_letter" rows="4" placeholder="Tell us about yourself and why you'd like to work with us..."></textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="submit" class="btn btn-primary">Submit Registration</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Thank You Page -->
+    <template id="job_seeker_thank_you" name="Job Seeker Registration - Thank You">
+        <t t-call="website.layout">
+            <div id="wrap" class="oe_structure">
+                <section class="s_text_block pt96 pb96 o_colored_level" data-snippet="s_text_block">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-8 offset-lg-2 text-center">
+                                <i class="fa fa-check-circle fa-5x text-success mb-4"></i>
+                                <h1 class="mb-4">Thank You for Your Interest!</h1>
+                                <p class="lead mb-4">
+                                    Your registration has been successfully submitted. We've added you to our job seeker pool.
+                                </p>
+                                <p>
+                                    We will review your information and contact you when a suitable position becomes available.
+                                    If you have any questions in the meantime, please don't hesitate to reach out to us.
+                                </p>
+                                <p class="text-muted">
+                                    <small>You will be redirected to the home page in <span id="countdown">5</span> seconds...</small>
+                                </p>
+                                <div class="mt-5">
+                                    <a href="/" class="btn btn-primary btn-lg me-2">
+                                        <i class="fa fa-home"/> Back to Home
+                                    </a>
+                                    <a href="/jobs" class="btn btn-secondary">
+                                        <i class="fa fa-briefcase"/> View Current Openings
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <script type="text/javascript">
+                <![CDATA[
+                // Auto redirect to home after 5 seconds
+                var timeLeft = 5;
+                var countdownElement = document.getElementById('countdown');
+                var countdownTimer = setInterval(function() {
+                    timeLeft--;
+                    if (countdownElement) {
+                        countdownElement.textContent = timeLeft;
+                    }
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownTimer);
+                        window.location.href = '/';
+                    }
+                }, 1000);
+                ]]>
+            </script>
+        </t>
+    </template>
+
+    <!-- Add JavaScript for View More functionality -->
+    <template id="jobs_view_more_script" inherit_id="website_hr_recruitment.index" name="Jobs View More Script">
+        <xpath expr="//div[@id='wrap']" position="after">
+            <script type="text/javascript">
+                <![CDATA[
+                function toggleJobDescription(event, jobId) {
+                    event.preventDefault();
+                    const wrapper = document.getElementById('job_desc_' + jobId);
+                    const content = wrapper.querySelector('.job-description-content');
+                    const fade = wrapper.querySelector('.job-description-fade');
+                    const btn = wrapper.querySelector('.view-more-btn');
+                    const icon = btn.querySelector('i');
+
+                    if (content.style.maxHeight === 'none') {
+                        // Collapse
+                        content.style.maxHeight = '100px';
+                        content.style.overflow = 'hidden';
+                        if (fade) fade.style.display = 'block';
+                        icon.className = 'fa fa-chevron-down';
+                        btn.innerHTML = '<i class="fa fa-chevron-down"></i> View More';
+                    } else {
+                        // Expand
+                        content.style.maxHeight = 'none';
+                        content.style.overflow = 'visible';
+                        if (fade) fade.style.display = 'none';
+                        icon.className = 'fa fa-chevron-up';
+                        btn.innerHTML = '<i class="fa fa-chevron-up"></i> View Less';
+                    }
+                }
+                ]]>
+            </script>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Mode Toggle to Detailed Form -->
+    <template id="portal_create_recruitment_mode_toggle" inherit_id="recruitment_management.portal_create_recruitment_request" name="Add Mode Toggle">
+
+        <!-- Add mode toggle after the header -->
+        <xpath expr="//div[hasclass('section-header')]" position="after">
+            <div class="form-mode-toggle-detailed mb-4">
+                <div class="d-flex gap-3">
+                    <a href="/my/recruitment/new?mode=quick" class="mode-option-detailed">
+                        <i class="fa fa-bolt fa-2x mb-2 text-warning"/>
+                        <h6 class="mb-1">Quick Submit</h6>
+                        <p class="text-muted mb-0" style="font-size: 0.8rem;">
+                            Simple form
+                        </p>
+                    </a>
+                    <a href="/my/recruitment/new?mode=detailed" class="mode-option-detailed active">
+                        <i class="fa fa-list-alt fa-2x mb-2 text-info"/>
+                        <h6 class="mb-1">Detailed Form</h6>
+                        <p class="text-muted mb-0" style="font-size: 0.8rem;">
+                            Complete details
+                        </p>
+                    </a>
+                </div>
+            </div>
+
+            <style>
+                .form-mode-toggle-detailed {
+                    background: white;
+                    padding: 1.5rem;
+                    border-radius: 15px;
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+                    max-width: 600px;
+                    margin: 0 auto;
+                }
+
+                .mode-option-detailed {
+                    flex: 1;
+                    padding: 1.25rem;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 12px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    text-align: center;
+                    background: white;
+                    text-decoration: none;
+                    display: block;
+                }
+
+                .mode-option-detailed:hover {
+                    border-color: #667eea;
+                    transform: translateY(-3px);
+                    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+                }
+
+                .mode-option-detailed.active {
+                    border-color: #667eea;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                }
+
+                .mode-option-detailed.active i,
+                .mode-option-detailed.active h6,
+                .mode-option-detailed.active p {
+                    color: white !important;
+                }
+
+                .mode-option-detailed h6 {
+                    font-weight: 600;
+                    margin-bottom: 0.25rem;
+                }
+
+                .mode-option-detailed p {
+                    font-size: 0.8rem;
+                }
+
+                @media (max-width: 768px) {
+                    .form-mode-toggle-detailed {
+                        padding: 1rem;
+                    }
+
+                    .mode-option-detailed {
+                        padding: 1rem;
+                    }
+
+                    .mode-option-detailed i {
+                        font-size: 1.5rem !important;
+                    }
+
+                    .mode-option-detailed h6 {
+                        font-size: 0.9rem;
+                    }
+                }
+            </style>
+        </xpath>
+
+    </template>
+</odoo>

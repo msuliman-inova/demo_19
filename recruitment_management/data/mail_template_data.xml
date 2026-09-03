@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <!-- Email Template: Request Submitted -->
+        <record id="email_template_request_submitted" model="mail.template">
+            <field name="name">Recruitment Request: Submitted</field>
+            <field name="model_id" ref="model_recruitment_request"/>
+            <field name="subject">Recruitment Request Submitted - {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="email_to">{{ object.partner_id.email }}</field>
+            <field name="body_html" type="html">
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background-color: #875A7B; padding: 20px; text-align: center;">
+        <h2 style="color: white; margin: 0;">Recruitment Request Submitted</h2>
+    </div>
+
+    <div style="padding: 20px; background-color: #f9f9f9;">
+        <p>Dear <strong>{{ object.partner_id.name }}</strong>,</p>
+
+        <p>Thank you for submitting your recruitment request. We have received your request and our team will review it shortly.</p>
+
+        <div style="background-color: white; padding: 15px; margin: 20px 0; border-left: 4px solid #875A7B;">
+            <h3 style="margin-top: 0;">Request Details:</h3>
+            <table style="width: 100%;">
+                <tr>
+                    <td style="padding: 5px;"><strong>Request Number:</strong></td>
+                    <td style="padding: 5px;">{{ object.name }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px;"><strong>Company:</strong></td>
+                    <td style="padding: 5px;">{{ object.partner_id.name }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px;"><strong>Total Positions:</strong></td>
+                    <td style="padding: 5px;">{{ object.no_of_positions }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px;"><strong>Job Lines:</strong></td>
+                    <td style="padding: 5px;">{{ len(object.line_ids) }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <p>You can track the status of your request at any time through your portal.</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="/my/recruitment/{{ object.id }}"
+               style="background-color: #875A7B; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                View Request
+            </a>
+        </div>
+
+        <p>If you have any questions, please don't hesitate to contact us.</p>
+
+        <p>Best regards,<br/>
+        <strong>{{ object.company_id.name }}</strong></p>
+    </div>
+
+    <div style="background-color: #875A7B; padding: 15px; text-align: center; color: white; font-size: 12px;">
+        <p style="margin: 0;">{{ object.company_id.name }}</p>
+        <p style="margin: 5px 0;">{{ object.company_id.email }} | {{ object.company_id.phone }}</p>
+    </div>
+</div>
+            </field>
+        </record>
+
+        <!-- Email Template: Quotation Sent -->
+        <record id="email_template_quotation" model="mail.template">
+            <field name="name">Recruitment Request: Quotation</field>
+            <field name="model_id" ref="model_recruitment_request"/>
+            <field name="subject">Quotation for Recruitment Request - {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="email_to">{{ object.partner_id.email }}</field>
+            <field name="body_html" type="html">
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background-color: #875A7B; padding: 20px; text-align: center;">
+        <h2 style="color: white; margin: 0;">Recruitment Service Quotation</h2>
+    </div>
+
+    <div style="padding: 20px; background-color: #f9f9f9;">
+        <p>Dear <strong>{{ object.partner_id.name }}</strong>,</p>
+
+        <p>Thank you for your recruitment request. Please find below our quotation for your requirement:</p>
+
+        <div style="background-color: white; padding: 15px; margin: 20px 0; border-left: 4px solid #875A7B;">
+            <h3 style="margin-top: 0;">Position Details:</h3>
+            <table style="width: 100%;">
+                <tr>
+                    <td style="padding: 5px;"><strong>Company:</strong></td>
+                    <td style="padding: 5px;">{{ object.partner_id.name }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px;"><strong>Total Positions:</strong></td>
+                    <td style="padding: 5px;">{{ object.no_of_positions }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px;"><strong>Job Lines:</strong></td>
+                    <td style="padding: 5px;">{{ len(object.line_ids) }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Pricing Details - Removed as per requirement
+        <div style="background-color: white; padding: 15px; margin: 20px 0;">
+            <h3 style="margin-top: 0;">Pricing Details:</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;"><strong>Service Fee:</strong></td>
+                    <td style="padding: 10px; text-align: right;">
+                        {{ '{:,.2f}'.format(object.service_fee) }} {{ object.currency_id.symbol }}
+                    </td>
+                </tr>
+                {% if object.additional_fee %}
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;"><strong>Additional Services:</strong></td>
+                    <td style="padding: 10px; text-align: right;">
+                        {{ '{:,.2f}'.format(object.additional_fee) }} {{ object.currency_id.symbol }}
+                    </td>
+                </tr>
+                {% endif %}
+                {% if object.discount_amount %}
+                <tr style="border-bottom: 1px solid #ddd;">
+                    <td style="padding: 10px;"><strong>Discount ({{ object.discount_percentage }}%):</strong></td>
+                    <td style="padding: 10px; text-align: right; color: #28a745;">
+                        - {{ '{:,.2f}'.format(object.discount_amount) }} {{ object.currency_id.symbol }}
+                    </td>
+                </tr>
+                {% endif %}
+                <tr style="background-color: #875A7B; color: white;">
+                    <td style="padding: 15px;"><strong>Total Amount:</strong></td>
+                    <td style="padding: 15px; text-align: right; font-size: 18px;">
+                        <strong>{{ '{:,.2f}'.format(object.final_amount) }} {{ object.currency_id.symbol }}</strong>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        -->
+
+        {% if object.additional_services %}
+        <div style="background-color: white; padding: 15px; margin: 20px 0;">
+            <h4>Additional Services Included:</h4>
+            <ul>
+            {% for service in object.additional_services %}
+                <li>{{ service.name }} - {{ '{:,.2f}'.format(service.price) }} {{ object.currency_id.symbol }}</li>
+            {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <p><strong>This quotation is valid for 30 days.</strong></p>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="/my/recruitment/{{ object.id }}"
+               style="background-color: #875A7B; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                View Quotation
+            </a>
+        </div>
+
+        <p>To proceed with this quotation, please contact us or approve through your portal.</p>
+
+        <p>Best regards,<br/>
+        <strong>{{ object.user_id.name }}</strong><br/>
+        {{ object.company_id.name }}</p>
+    </div>
+
+    <div style="background-color: #875A7B; padding: 15px; text-align: center; color: white; font-size: 12px;">
+        <p style="margin: 0;">{{ object.company_id.name }}</p>
+        <p style="margin: 5px 0;">{{ object.company_id.email }} | {{ object.company_id.phone }}</p>
+    </div>
+</div>
+            </field>
+        </record>
+
+        <!-- Email Template: Request Approved -->
+        <record id="email_template_request_approved" model="mail.template">
+            <field name="name">Recruitment Request: Approved</field>
+            <field name="model_id" ref="model_recruitment_request"/>
+            <field name="subject">Recruitment Request Approved - {{ object.name }}</field>
+            <field name="email_from">{{ (object.company_id.email or user.email_formatted) }}</field>
+            <field name="email_to">{{ object.partner_id.email }}</field>
+            <field name="body_html" type="html">
+<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+    <div style="background-color: #28a745; padding: 20px; text-align: center;">
+        <h2 style="color: white; margin: 0;">✓ Request Approved</h2>
+    </div>
+
+    <div style="padding: 20px; background-color: #f9f9f9;">
+        <p>Dear <strong>{{ object.partner_id.name }}</strong>,</p>
+
+        <p>Great news! Your recruitment request has been approved and we are ready to start the recruitment process.</p>
+
+        <div style="background-color: white; padding: 15px; margin: 20px 0; border-left: 4px solid #28a745;">
+            <h3 style="margin-top: 0;">Request Information:</h3>
+            <table style="width: 100%;">
+                <tr>
+                    <td style="padding: 5px;"><strong>Request Number:</strong></td>
+                    <td style="padding: 5px;">{{ object.name }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px;"><strong>Company:</strong></td>
+                    <td style="padding: 5px;">{{ object.partner_id.name }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 5px;"><strong>Total Positions:</strong></td>
+                    <td style="padding: 5px;">{{ object.no_of_positions }}</td>
+                </tr>
+                <!-- Approved Amount removed as per requirement
+                <tr>
+                    <td style="padding: 5px;"><strong>Approved Amount:</strong></td>
+                    <td style="padding: 5px;">{{ '{:,.2f}'.format(object.final_amount) }} {{ object.currency_id.symbol }}</td>
+                </tr>
+                -->
+            </table>
+        </div>
+
+        <h3>Next Steps:</h3>
+        <ol>
+            <li>We will create the job position and start advertising</li>
+            <li>You will receive regular updates on applicants</li>
+            <li>We will coordinate interview schedules with you</li>
+            <li>Invoice will be generated as per agreement</li>
+        </ol>
+
+        <div style="text-align: center; margin: 30px 0;">
+            <a href="/my/recruitment/{{ object.id }}"
+               style="background-color: #28a745; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                Track Progress
+            </a>
+        </div>
+
+        <p>Thank you for choosing our recruitment services!</p>
+
+        <p>Best regards,<br/>
+        <strong>{{ object.user_id.name }}</strong><br/>
+        {{ object.company_id.name }}</p>
+    </div>
+
+    <div style="background-color: #28a745; padding: 15px; text-align: center; color: white; font-size: 12px;">
+        <p style="margin: 0;">{{ object.company_id.name }}</p>
+        <p style="margin: 5px 0;">{{ object.company_id.email }} | {{ object.company_id.phone }}</p>
+    </div>
+</div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Main Menu -->
+    <menuitem id="menu_recruitment_management_root"
+              name="Recruitment Management"
+              sequence="45"
+              web_icon="recruitment_management,static/description/icon.png"/>
+
+    <!-- Requests Menu -->
+    <menuitem id="menu_recruitment_requests"
+              name="Requests"
+              parent="menu_recruitment_management_root"
+              sequence="10"/>
+
+    <menuitem id="menu_recruitment_request_all"
+              name="All Requests"
+              parent="menu_recruitment_requests"
+              action="recruitment_request_action_all"
+              sequence="10"
+              groups="recruitment_management.group_recruitment_user"/>
+
+    <menuitem id="menu_recruitment_request_my"
+              name="My Requests"
+              parent="menu_recruitment_requests"
+              action="recruitment_request_action"
+              sequence="20"/>
+
+    <!-- Configuration Menu -->
+    <menuitem id="menu_recruitment_configuration"
+              name="Configuration"
+              parent="menu_recruitment_management_root"
+              sequence="100"
+              groups="recruitment_management.group_recruitment_manager"/>
+
+    <menuitem id="menu_recruitment_pricing"
+              name="Pricing Rules"
+              parent="menu_recruitment_configuration"
+              action="recruitment_pricing_action"
+              sequence="10"/>
+
+    <menuitem id="menu_recruitment_additional_services"
+              name="Additional Services"
+              parent="menu_recruitment_configuration"
+              action="recruitment_additional_service_action"
+              sequence="20"/>
+
+    <menuitem id="menu_recruitment_urgency_settings"
+              name="Urgency Settings"
+              parent="menu_recruitment_configuration"
+              action="action_recruitment_urgency_config"
+              sequence="30"/>
+
+    <!-- Reporting Menu -->
+    <menuitem id="menu_recruitment_reporting"
+              name="Reporting"
+              parent="menu_recruitment_management_root"
+              sequence="90"
+              groups="recruitment_management.group_recruitment_user"/>
+
+</odoo>

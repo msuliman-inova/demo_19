@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Email template for notifying admin of new registration (optional) -->
+        <record id="email_template_job_seeker_registration" model="mail.template">
+            <field name="name">Job Seeker Registration: Notification</field>
+            <field name="model_id" ref="model_job_seeker_registration"/>
+            <field name="subject">New Job Seeker Registration - {{ object.name }}</field>
+            <field name="email_from">{{ (object.create_uid.email_formatted or user.email_formatted) }}</field>
+            <field name="email_to">{{ user.email }}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h2 style="color: #875a7b;">New Job Seeker Registration</h2>
+                    <p>A new job seeker has registered their interest for future positions.</p>
+
+                    <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Name:</strong></td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.name }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Email:</strong></td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.email }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Phone:</strong></td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.phone or 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Desired Position:</strong></td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.job_position }}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border: 1px solid #ddd;"><strong>Experience:</strong></td>
+                            <td style="padding: 8px; border: 1px solid #ddd;">{{ object.experience_years or 0 }} years</td>
+                        </tr>
+                    </table>
+
+                    <p style="margin-top: 20px;">
+                        <a href="/web#id={{ object.id }}&amp;model=job.seeker.registration&amp;view_type=form"
+                           style="background-color: #875a7b; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                            View Registration
+                        </a>
+                    </p>
+                </div>
+            </field>
+        </record>
+    </data>
+</odoo>

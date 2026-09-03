@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Quick Submit Form for Recruitment Requests -->
+    <template id="portal_quick_recruitment_request" name="Quick Submit Recruitment Request">
+        <t t-if="request.env.user.partner_id.user_type == 'employer'">
+            <t t-call="portal.portal_layout">
+
+                <style>
+                    .quick-submit-container {
+                        max-width: 1200px;
+                        margin: 0 auto;
+                    }
+
+                    .sidebar-tip-card {
+                        background: white;
+                        border-radius: 12px;
+                        padding: 1.25rem;
+                        margin-bottom: 1rem;
+                        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+                        transition: all 0.3s ease;
+                    }
+
+                    .sidebar-tip-card:hover {
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+                    }
+
+                    .form-mode-toggle {
+                        background: white;
+                        padding: 1.5rem;
+                        border-radius: 15px;
+                        margin-bottom: 2rem;
+                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+                    }
+
+                    .mode-option {
+                        flex: 1;
+                        padding: 1.5rem;
+                        border: 2px solid #e2e8f0;
+                        border-radius: 12px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        text-align: center;
+                        background: white;
+                        text-decoration: none;
+                        display: block;
+                    }
+
+                    .mode-option:hover {
+                        border-color: #667eea;
+                        transform: translateY(-3px);
+                        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.2);
+                    }
+
+                    .mode-option.active {
+                        border-color: #667eea;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white !important;
+                    }
+
+                    .mode-option.active i,
+                    .mode-option.active h5,
+                    .mode-option.active p {
+                        color: white !important;
+                    }
+
+                    .quick-form-card {
+                        background: white;
+                        padding: 1.5rem;
+                        border-radius: 12px;
+                        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+                        margin-bottom: 1rem;
+                    }
+
+                    .header-banner {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        padding: 2.5rem 2rem;
+                        border-radius: 15px;
+                        margin-bottom: 2rem;
+                        text-align: center;
+                        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+                    }
+
+                    .form-label {
+                        font-weight: 600;
+                        color: #2d3748;
+                        margin-bottom: 0.5rem;
+                        font-size: 0.9rem;
+                    }
+
+                    .form-control, .form-select {
+                        border: 1px solid #e2e8f0;
+                        border-radius: 8px;
+                        padding: 0.6rem 0.9rem;
+                        transition: all 0.3s ease;
+                        font-size: 0.95rem;
+                    }
+
+                    .form-control:focus, .form-select:focus {
+                        border-color: #667eea;
+                        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+                    }
+
+                    .required-field::after {
+                        content: " *";
+                        color: #f56565;
+                        font-weight: 700;
+                    }
+
+                    .info-text {
+                        font-size: 0.8rem;
+                        color: #718096;
+                        margin-top: 0.3rem;
+                        display: block;
+                    }
+
+                    .btn-submit {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        border: none;
+                        border-radius: 8px;
+                        padding: 0.75rem 2rem;
+                        font-weight: 600;
+                        color: white;
+                        font-size: 1rem;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                    }
+
+                    .btn-submit:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+                    }
+
+                    .btn-cancel {
+                        background: white;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 8px;
+                        padding: 0.75rem 1.5rem;
+                        font-weight: 500;
+                        color: #4a5568;
+                        transition: all 0.3s ease;
+                        text-decoration: none;
+                    }
+
+                    .btn-cancel:hover {
+                        border-color: #cbd5e0;
+                        background: #f7fafc;
+                        color: #4a5568;
+                    }
+                </style>
+
+                <div class="container-fluid mt-4 mb-5 quick-submit-container">
+                    <!-- Header Banner -->
+                    <div class="header-banner">
+                        <i class="fa fa-briefcase fa-3x mb-3"/>
+                        <h2 class="mb-2">Create Recruitment Request</h2>
+                        <p class="mb-0 opacity-90">Choose how you'd like to submit your request</p>
+                    </div>
+
+                    <!-- Form Mode Toggle -->
+                    <div class="form-mode-toggle">
+                        <div class="d-flex gap-3">
+                            <a href="/my/recruitment/new?mode=quick" class="mode-option active">
+                                <i class="fa fa-bolt fa-3x mb-3 text-warning"/>
+                                <h5 class="mb-2">Quick Submit</h5>
+                                <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                                    Simple form - Just describe your needs
+                                </p>
+                            </a>
+                            <a href="/my/recruitment/new?mode=detailed" class="mode-option">
+                                <i class="fa fa-list-alt fa-3x mb-3 text-info"/>
+                                <h5 class="mb-2">Detailed Form</h5>
+                                <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                                    Complete form with all job details
+                                </p>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <!-- Sidebar (Left - 3 columns) -->
+                        <div class="col-lg-3 col-md-12 mb-4">
+                            <div class="sticky-top" style="top: 20px;">
+                                <!-- Quick Tips -->
+                                <div class="sidebar-tip-card">
+                                    <h6 class="mb-3 fw-bold text-primary">
+                                        <i class="fa fa-lightbulb-o me-2"/>Quick Tips
+                                    </h6>
+                                    <ul class="list-unstyled mb-0" style="font-size: 0.9rem;">
+                                        <li class="mb-2">
+                                            <i class="fa fa-check text-success me-1"/>Be specific about job titles
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fa fa-check text-success me-1"/>Mention number of positions needed
+                                        </li>
+                                        <li class="mb-2">
+                                            <i class="fa fa-check text-success me-1"/>Include key requirements
+                                        </li>
+                                        <li class="mb-0">
+                                            <i class="fa fa-check text-success me-1"/>Add salary range if possible
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- What Happens Next -->
+                                <div class="sidebar-tip-card">
+                                    <h6 class="mb-3 fw-bold text-info">
+                                        <i class="fa fa-clock-o me-2"/>What Happens Next?
+                                    </h6>
+                                    <div style="font-size: 0.85rem; line-height: 1.6;">
+                                        <div class="mb-2">
+                                            <strong>1. Submission</strong><br/>
+                                            <span class="text-muted">Request sent to recruitment team</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>2. Review</strong><br/>
+                                            <span class="text-muted">Team analyzes your requirements</span>
+                                        </div>
+                                        <div class="mb-2">
+                                            <strong>3. Contact</strong><br/>
+                                            <span class="text-muted">We'll reach out to discuss details</span>
+                                        </div>
+                                        <div class="mb-0">
+                                            <strong>4. Action</strong><br/>
+                                            <span class="text-muted">Job posting created &amp; shared</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Need Help? -->
+                                <div class="sidebar-tip-card">
+                                    <h6 class="mb-2 fw-bold text-warning">
+                                        <i class="fa fa-question-circle me-2"/>Need Help?
+                                    </h6>
+                                    <p class="mb-2" style="font-size: 0.85rem;">
+                                        Not sure what to include? Our team is here to help you refine your requirements.
+                                    </p>
+                                    <p class="mb-0" style="font-size: 0.85rem;">
+                                        <i class="fa fa-envelope me-1"/>Contact support anytime
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Main Form (Right - 9 columns) -->
+                        <div class="col-lg-9 col-md-12">
+                            <!-- Quick Submit Form -->
+                            <form action="/my/recruitment/quick-create" method="POST" id="quick_recruitment_form">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                                <div class="quick-form-card">
+                                    <h4 class="mb-3">
+                                        <i class="fa fa-edit text-primary me-2"/>
+                                        Tell Us About Your Hiring Needs
+                                    </h4>
+
+                                    <!-- Work Location -->
+                                    <div class="mb-3">
+                                        <label for="work_location" class="form-label required-field">Work Location</label>
+                                        <input type="text" class="form-control" name="work_location" id="work_location" required="required"
+                                               placeholder="e.g., Dubai, UAE"/>
+                                        <small class="info-text">Where will the employee(s) be working?</small>
+                                    </div>
+
+                                    <!-- Description - Main Field -->
+                                    <div class="mb-3">
+                                        <label for="description" class="form-label required-field">Job Description</label>
+                                        <textarea class="form-control" name="description" id="description" rows="8" required="required"
+                                                  placeholder="Describe what you're looking for:&#10;&#10;- Job title(s) and number of positions&#10;- Key responsibilities&#10;- Required qualifications and experience&#10;- Salary range (if applicable)&#10;- Any other important details"></textarea>
+                                        <small class="info-text">
+                                            Please provide as much detail as possible. Our team will review and create the full job posting for you.
+                                        </small>
+                                    </div>
+
+                                    <div class="row">
+                                        <!-- Expected Start Date -->
+                                        <div class="col-md-6 mb-3">
+                                            <label for="expected_start_date" class="form-label">Expected Start Date</label>
+                                            <input type="date" class="form-control" name="expected_start_date" id="expected_start_date"/>
+                                            <small class="info-text">When do you need the employee(s) to start?</small>
+                                        </div>
+
+                                        <!-- Remote Work -->
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label d-block">Work Arrangement</label>
+                                            <div class="form-check form-switch mt-2">
+                                                <input type="checkbox" class="form-check-input" name="remote_work" id="remote_work" value="1" style="cursor: pointer;"/>
+                                                <label class="form-check-label" for="remote_work" style="cursor: pointer;">
+                                                    <i class="fa fa-home text-success me-1"/>
+                                                    Remote Work Available
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Action Buttons -->
+                                <div class="d-flex justify-content-between align-items-center mt-4">
+                                    <a href="/my/recruitment" class="btn btn-cancel">
+                                        <i class="fa fa-times me-2"/>Cancel
+                                    </a>
+                                    <button type="submit" class="btn btn-submit">
+                                        <i class="fa fa-paper-plane me-2"/>Submit Request
+                                    </button>
+                                </div>
+
+                                <div class="mt-3 p-3" style="background-color: #f0f9ff; border-left: 4px solid #667eea; border-radius: 8px;">
+                                    <p class="mb-2">
+                                        <i class="fa fa-info-circle me-1 text-primary"></i>
+                                        <strong>What happens when you submit?</strong>
+                                    </p>
+                                    <ul class="mb-0" style="font-size: 0.9rem;">
+                                        <li>Your request will be submitted to our recruitment team</li>
+                                        <li>A CRM lead will be created for immediate follow-up</li>
+                                        <li>Our team will contact you to discuss the detailed requirements</li>
+                                        <li>You'll receive email notifications at each step</li>
+                                    </ul>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </t>
+        </t>
+        <t t-else="">
+            <t t-call="portal.portal_layout">
+                <div class="container mt-5 text-center">
+                    <h3>Access Denied</h3>
+                    <p>Only employers can create recruitment requests.</p>
+                    <a href="/my" class="btn btn-primary">Back to Portal</a>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

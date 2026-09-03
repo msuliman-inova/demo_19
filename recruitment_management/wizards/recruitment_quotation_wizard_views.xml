@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Quotation Wizard Form View -->
+    <record id="recruitment_quotation_wizard_view_form" model="ir.ui.view">
+        <field name="name">recruitment.quotation.wizard.form</field>
+        <field name="model">recruitment.quotation.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Send Quotation">
+                <group>
+                    <field name="request_id" invisible="1"/>
+                    <field name="partner_id" readonly="1"/>
+                    <field name="currency_id" invisible="1"/>
+                </group>
+
+                <group string="Pricing">
+                    <group>
+                        <field name="service_fee"/>
+                        <field name="additional_services" widget="many2many_tags"/>
+                        <field name="additional_fee" readonly="1"/>
+                    </group>
+                    <group>
+                        <field name="discount_percentage"/>
+                        <field name="total_amount" readonly="1"/>
+                        <field name="discount_amount" readonly="1"/>
+                        <field name="final_amount" readonly="1" class="oe_subtotal_footer_separator"/>
+                    </group>
+                </group>
+
+                <group string="Email Settings">
+                    <group>
+                        <field name="send_email"/>
+                        <field name="email_template_id" invisible="not send_email" required="send_email"/>
+                    </group>
+                    <group>
+                        <field name="validity_days"/>
+                    </group>
+                </group>
+
+                <group string="Additional Notes">
+                    <field name="notes" nolabel="1" placeholder="Add any special terms or conditions..."/>
+                </group>
+
+                <footer>
+                    <button string="Create Quotation" name="action_send_quotation" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

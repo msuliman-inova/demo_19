@@ -1,0 +1,3061 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <!-- Portal My Home - Modern Recruitment Card with Create Button -->
+    <template id="portal_my_home_recruitment" name="Show Recruitment Requests" inherit_id="portal.portal_my_home"
+              priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <!-- Only show for Employer users -->
+            <t t-if="request.env.user.partner_id.user_type == 'employer'">
+                <t t-set="recruitment_count"
+                   t-value="len(request.env['recruitment.request'].search([('partner_id', '=', request.env.user.partner_id.commercial_partner_id.id)]))"/>
+                <style>
+                    .recruitment-home-card {
+                        border: none;
+                        border-radius: 20px;
+                        overflow: hidden;
+                        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                    }
+                    .recruitment-home-card:hover {
+                        transform: translateY(-8px);
+                        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+                    }
+                    .recruitment-card-header {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        padding: 2rem 1.5rem;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    .recruitment-card-header::before {
+                        content: '';
+                        position: absolute;
+                        top: -50%;
+                        right: -50%;
+                        width: 200%;
+                        height: 200%;
+                        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                        animation: pulse 3s ease-in-out infinite;
+                    }
+                    @keyframes pulse {
+                        0%, 100% { transform: scale(1); opacity: 0.5; }
+                        50% { transform: scale(1.1); opacity: 0.8; }
+                    }
+                    .recruitment-icon-wrapper {
+                        width: 80px;
+                        height: 80px;
+                        background: rgba(255, 255, 255, 0.2);
+                        backdrop-filter: blur(10px);
+                        border-radius: 20px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin: 0 auto 1rem;
+                        position: relative;
+                        z-index: 1;
+                    }
+                    .recruitment-count-badge {
+                        background: rgba(255, 255, 255, 0.95);
+                        border-radius: 15px;
+                        padding: 1rem 1.5rem;
+                        margin-top: 1rem;
+                        display: inline-block;
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    }
+                    .recruitment-btn-primary {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        border: none;
+                        border-radius: 12px;
+                        padding: 0.75rem 1.5rem;
+                        font-weight: 600;
+                        transition: all 0.3s ease;
+                        box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);
+                    }
+                    .recruitment-btn-primary:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+                    }
+                    .recruitment-btn-outline {
+                        border: 2px solid #667eea;
+                        color: #667eea;
+                        border-radius: 12px;
+                        padding: 0.75rem 1.5rem;
+                        font-weight: 600;
+                        background: white;
+                        transition: all 0.3s ease;
+                    }
+                    .recruitment-btn-outline:hover {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        border-color: transparent;
+                        transform: translateY(-2px);
+                    }
+                </style>
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card recruitment-home-card h-100">
+                        <div class="recruitment-card-header text-center text-white">
+                            <div class="recruitment-icon-wrapper">
+                                <i class="fa fa-briefcase fa-3x text-white"></i>
+                            </div>
+                            <h5 class="fw-bold mb-2">Recruitment Hub</h5>
+                            <p class="mb-0 opacity-75">Manage your hiring pipeline</p>
+                            <div class="recruitment-count-badge">
+                                <span class="h3 text-primary fw-bold mb-0 d-block" t-out="recruitment_count"/>
+                                <small class="text-muted">Active Requests</small>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="d-grid gap-3">
+                                <a href="/my/recruitment/new" class="btn recruitment-btn-primary">
+                                    <i class="fa fa-plus me-2"></i>
+                                    Create New Request
+                                </a>
+                                <a href="/my/recruitment" class="btn recruitment-btn-outline">
+                                    <i class="fa fa-eye me-2"></i>
+                                    View All Requests
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Portal - My Recruitment Requests List -->
+    <template id="portal_my_recruitment_requests" name="My Recruitment Requests">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Recruitment Requests</t>
+            </t>
+
+            <!-- Two Column Layout: Sidebar + Main Content -->
+            <div class="row mt-4">
+                <!-- Sidebar (Left side - 4 columns) -->
+                <div class="col-lg-4 col-md-12 mb-4">
+                    <div class="portal-sidebar-container sticky-top" style="top: 20px;">
+                        <style>
+                            .portal-sidebar-container {
+                                background: white;
+                                border-radius: 20px;
+                                padding: 1.5rem;
+                                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                            }
+                            .sidebar-section {
+                                margin-bottom: 2rem;
+                                padding-bottom: 1.5rem;
+                                border-bottom: 2px solid #e2e8f0;
+                            }
+                            .sidebar-section:last-child {
+                                border-bottom: none;
+                                margin-bottom: 0;
+                            }
+                            .sidebar-title {
+                                font-size: 0.95rem;
+                                font-weight: 700;
+                                color: #2d3748;
+                                text-transform: uppercase;
+                                letter-spacing: 0.5px;
+                                margin-bottom: 1rem;
+                            }
+                            .sidebar-stat-card {
+                                background: linear-gradient(145deg, #f7fafc 0%, #edf2f7 100%);
+                                border-radius: 12px;
+                                padding: 1rem;
+                                margin-bottom: 0.75rem;
+                                transition: all 0.3s ease;
+                                text-decoration: none;
+                                display: block;
+                            }
+                            .sidebar-stat-card:hover {
+                                transform: translateX(5px);
+                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                            }
+                            .sidebar-stat-number {
+                                font-size: 1.75rem;
+                                font-weight: 700;
+                                margin-bottom: 0.25rem;
+                            }
+                            .sidebar-stat-label {
+                                font-size: 0.85rem;
+                                color: #718096;
+                                font-weight: 500;
+                            }
+                            .sidebar-alert {
+                                background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+                                border-radius: 12px;
+                                padding: 0.75rem;
+                                margin-bottom: 0.75rem;
+                                transition: all 0.3s ease;
+                                cursor: pointer;
+                                display: block;
+                                text-decoration: none;
+                                overflow: hidden;
+                                word-wrap: break-word;
+                            }
+                            .sidebar-alert:hover {
+                                transform: translateX(5px);
+                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                            }
+                            .sidebar-alert.warning {
+                                background: linear-gradient(135deg, #fef5e7 0%, #fce8c3 100%);
+                            }
+                            .sidebar-alert .small {
+                                font-size: 0.75rem;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                                white-space: nowrap;
+                            }
+                            .sidebar-action-btn {
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                color: white;
+                                border: none;
+                                border-radius: 12px;
+                                padding: 0.75rem 1.5rem;
+                                font-weight: 600;
+                                width: 100%;
+                                transition: all 0.3s ease;
+                                box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                                text-decoration: none;
+                                display: inline-block;
+                                text-align: center;
+                            }
+                            .sidebar-action-btn:hover {
+                                transform: translateY(-2px);
+                                box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+                                color: white;
+                            }
+                        </style>
+
+                        <!-- Quick Actions Section -->
+                        <div class="sidebar-section">
+                            <h6 class="sidebar-title">
+                                <i class="fa fa-bolt me-2"/>Quick Actions
+                            </h6>
+                            <a href="/my/recruitment/new" class="sidebar-action-btn mb-2">
+                                <i class="fa fa-plus me-2"/>
+                                Create New Request
+                            </a>
+                        </div>
+
+                        <!-- Urgency Alerts Section -->
+                        <t t-if="urgent_requests or attention_requests">
+                            <div class="sidebar-section">
+                                <h6 class="sidebar-title">
+                                    <i class="fa fa-exclamation-triangle me-2"/>Alerts
+                                </h6>
+
+                                <!-- Urgent Alerts -->
+                                <t t-foreach="urgent_requests" t-as="urgent_req">
+                                    <a t-attf-href="/my/recruitment/#{urgent_req['request'].id}/applicants" class="sidebar-alert">
+                                        <div class="d-flex align-items-center justify-content-between gap-2">
+                                            <div class="flex-grow-1" style="min-width: 0;">
+                                                <div class="fw-bold text-danger" style="font-size: 0.85rem;">
+                                                    <i class="fa fa-fire me-1"/>
+                                                    <t t-out="urgent_req['count']"/> Urgent
+                                                </div>
+                                                <div class="small text-dark">
+                                                    <t t-out="urgent_req['request'].name[:25]"/>...
+                                                </div>
+                                            </div>
+                                            <i class="fa fa-chevron-right text-danger" style="font-size: 0.75rem;"/>
+                                        </div>
+                                    </a>
+                                </t>
+
+                                <!-- Attention Alerts -->
+                                <t t-foreach="attention_requests" t-as="attention_req">
+                                    <a t-attf-href="/my/recruitment/#{attention_req['request'].id}/applicants" class="sidebar-alert warning">
+                                        <div class="d-flex align-items-center justify-content-between gap-2">
+                                            <div class="flex-grow-1" style="min-width: 0;">
+                                                <div class="fw-bold text-warning" style="font-size: 0.85rem;">
+                                                    <i class="fa fa-clock-o me-1"/>
+                                                    <t t-out="attention_req['count']"/> Pending
+                                                </div>
+                                                <div class="small text-dark">
+                                                    <t t-out="attention_req['request'].name[:25]"/>...
+                                                </div>
+                                            </div>
+                                            <i class="fa fa-chevron-right text-warning" style="font-size: 0.75rem;"/>
+                                        </div>
+                                    </a>
+                                </t>
+                            </div>
+                        </t>
+
+                        <!-- Statistics Section -->
+                        <div class="sidebar-section">
+                            <h6 class="sidebar-title">
+                                <i class="fa fa-bar-chart me-2"/>Statistics
+                            </h6>
+
+                            <a href="/my/recruitment?filterby=all" class="sidebar-stat-card">
+                                <div class="sidebar-stat-number text-primary">
+                                    <t t-esc="status_counts.get('draft', 0) + status_counts.get('submitted', 0) + status_counts.get('under_review', 0) + status_counts.get('quotation_sent', 0) + status_counts.get('approved', 0) + status_counts.get('in_progress', 0) + status_counts.get('completed', 0)"/>
+                                </div>
+                                <div class="sidebar-stat-label">
+                                    <i class="fa fa-briefcase me-1"/>Total Requests
+                                </div>
+                            </a>
+
+                            <a href="/my/recruitment?filterby=draft" class="sidebar-stat-card">
+                                <div class="sidebar-stat-number text-secondary">
+                                    <t t-esc="status_counts.get('draft', 0)"/>
+                                </div>
+                                <div class="sidebar-stat-label">
+                                    <i class="fa fa-file-text-o me-1"/>Draft
+                                </div>
+                            </a>
+
+                            <a href="/my/recruitment?filterby=submitted" class="sidebar-stat-card">
+                                <div class="sidebar-stat-number text-info">
+                                    <t t-esc="status_counts.get('submitted', 0) + status_counts.get('under_review', 0)"/>
+                                </div>
+                                <div class="sidebar-stat-label">
+                                    <i class="fa fa-hourglass-half me-1"/>Under Review
+                                </div>
+                            </a>
+
+                            <a href="/my/recruitment?filterby=approved" class="sidebar-stat-card">
+                                <div class="sidebar-stat-number text-success">
+                                    <t t-esc="status_counts.get('approved', 0) + status_counts.get('in_progress', 0)"/>
+                                </div>
+                                <div class="sidebar-stat-label">
+                                    <i class="fa fa-check-circle me-1"/>Active
+                                </div>
+                            </a>
+
+                            <a href="/my/recruitment?filterby=completed" class="sidebar-stat-card">
+                                <div class="sidebar-stat-number text-primary">
+                                    <t t-esc="status_counts.get('completed', 0)"/>
+                                </div>
+                                <div class="sidebar-stat-label">
+                                    <i class="fa fa-check me-1"/>Completed
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Sidebar -->
+
+                <!-- Main Content Area (Right side - 8 columns) -->
+                <div class="col-lg-8 col-md-12 mb-4">
+                    <!-- Modern Dashboard Styles with Glassmorphism -->
+            <style>
+                .hover-shadow {
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    border: none !important;
+                    border-radius: 16px;
+                    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+                    position: relative;
+                    overflow: hidden;
+                }
+                .hover-shadow::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 4px;
+                    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+                    transform: scaleX(0);
+                    transition: transform 0.3s ease;
+                }
+                .hover-shadow:hover::before {
+                    transform: scaleX(1);
+                }
+                .hover-shadow:hover {
+                    transform: translateY(-8px) scale(1.02);
+                    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+                }
+                .card-body i.fa {
+                    transition: transform 0.3s ease;
+                }
+                .hover-shadow:hover i.fa {
+                    transform: scale(1.1) rotate(5deg);
+                }
+                .hover-shadow .card-title {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                    font-weight: 700;
+                }
+            </style>
+
+            <!-- Modern Empty State -->
+            <t t-if="not requests">
+                <style>
+                    .empty-state {
+                        background: linear-gradient(145deg, #ffffff 0%, #f7fafc 100%);
+                        border-radius: 24px;
+                        padding: 4rem 2rem;
+                        text-align: center;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        margin-top: 2rem;
+                    }
+                    .empty-state-icon {
+                        width: 120px;
+                        height: 120px;
+                        margin: 0 auto 2rem;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+                        animation: bounce 2s ease-in-out infinite;
+                    }
+                    @keyframes bounce {
+                        0%, 100% { transform: translateY(0); }
+                        50% { transform: translateY(-10px); }
+                    }
+                    .empty-state h3 {
+                        color: #2d3748;
+                        font-weight: 700;
+                        margin-bottom: 1rem;
+                    }
+                    .empty-state p {
+                        color: #718096;
+                        font-size: 1.1rem;
+                        margin-bottom: 2rem;
+                    }
+                </style>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fa fa-briefcase fa-4x text-white"/>
+                    </div>
+                    <h3>No Recruitment Requests Yet</h3>
+                    <p>Start building your dream team by creating your first recruitment request</p>
+                    <a href="/my/recruitment/new" class="btn btn-primary btn-lg">
+                        <i class="fa fa-plus me-2"/>
+                        Create Your First Request
+                    </a>
+                </div>
+            </t>
+
+            <!-- Modern Table Styling -->
+            <style>
+                .modern-table-container {
+                    background: white;
+                    border-radius: 20px;
+                    padding: 1.5rem;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                    margin-top: 2rem;
+                }
+                .table {
+                    margin-bottom: 0;
+                }
+                .table thead th {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    font-size: 0.85rem;
+                    letter-spacing: 0.5px;
+                    padding: 1rem;
+                    border: none;
+                }
+                .table thead tr:first-child th:first-child {
+                    border-radius: 12px 0 0 0;
+                }
+                .table thead tr:first-child th:last-child {
+                    border-radius: 0 12px 0 0;
+                }
+                .table tbody tr {
+                    transition: all 0.3s ease;
+                    border-bottom: 1px solid #e2e8f0;
+                }
+                .table tbody tr:hover {
+                    background-color: #f7fafc;
+                    transform: scale(1.01);
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                }
+                .table tbody td {
+                    padding: 1.25rem 1rem;
+                    vertical-align: middle;
+                    color: #2d3748;
+                    font-weight: 500;
+                }
+                .table tbody tr:last-child td {
+                    border-bottom: none;
+                }
+                .badge {
+                    padding: 0.5rem 1rem;
+                    border-radius: 20px;
+                    font-weight: 600;
+                    font-size: 0.85rem;
+                    letter-spacing: 0.3px;
+                }
+                .clickable-row {
+                    cursor: pointer;
+                }
+                .clickable-row:hover {
+                    background-color: #f7fafc !important;
+                }
+            </style>
+
+            <!-- JavaScript for clickable rows -->
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    const rows = document.querySelectorAll('.clickable-row');
+                    rows.forEach(function(row) {
+                        row.addEventListener('click', function(e) {
+                            // Don't navigate if clicking on a button or link
+                            if (e.target.closest('a') || e.target.closest('button')) {
+                                return;
+                            }
+                            const href = this.getAttribute('data-href');
+                            if (href) {
+                                window.location.href = href;
+                            }
+                        });
+                    });
+                });
+            </script>
+
+            <!-- If requests exist -->
+            <t t-if="requests" t-call="portal.portal_table">
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0" style="color: #2d3748; font-weight: 700;">
+                        <i class="fa fa-list me-2" style="color: #667eea;"/>
+                        Your Recruitment Requests
+                    </h4>
+                    <a href="/my/recruitment/new" class="btn btn-primary">
+                        <i class="fa fa-plus me-2"/>
+                        New Request
+                    </a>
+                </div>
+
+                <div class="modern-table-container">
+                    <thead>
+                        <tr class="active">
+                            <th>Request #</th>
+                            <th>Company</th>
+                            <th>Positions</th>
+                            <!-- <th>Amount</th> Removed as per requirement -->
+                            <th>Submission Date</th>
+                            <th class="text-center">Status</th>
+                            <th class="text-center">Action</th> <!-- Added Action column -->
+                        </tr>
+                    </thead>
+
+                <tbody>
+                    <t t-foreach="requests" t-as="request">
+                        <tr class="clickable-row" t-attf-data-href="/my/recruitment/#{request.id}" style="cursor: pointer;">
+                            <td>
+                                <a t-attf-href="/my/recruitment/#{request.id}" class="text-decoration-none text-dark">
+                                    <t t-out="request.name"/>
+                                </a>
+                            </td>
+
+                            <td>
+                                <t t-out="request.partner_id.name"/>
+                            </td>
+                            <td>
+                                <t t-out="request.no_of_positions"/>
+                            </td>
+
+                            <!-- <td> Amount column removed as per requirement
+                                <t t-if="request.final_amount">
+                                    <span t-field="request.final_amount"
+                                          t-options='{"widget": "monetary", "display_currency": request.currency_id}'/>
+                                </t>
+                            </td> -->
+
+                            <td>
+                                <span t-if="request.submission_date"
+                                      t-field="request.submission_date"
+                                      t-options='{"widget": "date"}'/>
+                            </td>
+
+                            <td class="text-center">
+                                <t t-set="status_class">
+                                    <t t-if="request.state == 'draft'">bg-secondary</t>
+                                    <t t-elif="request.state in ['submitted', 'under_review']">bg-info</t>
+                                    <t t-elif="request.state == 'quotation_sent'">bg-warning</t>
+                                    <t t-elif="request.state in ['approved', 'in_progress']">bg-success</t>
+                                    <t t-elif="request.state == 'completed'">bg-primary</t>
+                                    <t t-else="">bg-danger</t>
+                                </t>
+                                <span t-attf-class="badge text-white #{status_class}">
+                                    <t t-out="dict(request._fields['state'].selection).get(request.state)"/>
+                                </span>
+                            </td>
+
+                            <!-- Edit Button Column -->
+                            <td class="text-center" onclick="event.stopPropagation();">
+                                <t t-if="request.env.user.partner_id.user_type == 'employer' and request.state in ['draft','submitted','under_review','quotation_sent']">
+                                    <a t-attf-href="/my/recruitment/#{request.id}/edit"
+                                       class="btn btn-sm btn-outline-primary"
+                                       onclick="event.stopPropagation();">
+                                        <i class="fa fa-edit"/>
+                                        Edit
+                                    </a>
+                                </t>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+                </div>
+            </t>
+                </div>
+                <!-- End Main Content Area -->
+            </div>
+        </t>
+    </template>
+
+
+    <!-- Portal - Recruitment Request Detail -->
+    <template id="portal_my_recruitment_request" name="My Recruitment Request">
+        <t t-if="request.env.user.partner_id.user_type == 'employer'">
+            <t t-call="portal.portal_layout">
+                <t t-set="o_portal_fullwidth_alert" groups="recruitment_management.group_recruitment_user">
+                    <t t-call="portal.portal_back_in_edit_mode">
+                        <t t-set="backend_url"
+                           t-value="'/odoo/action-%s/%s' % (request.env.ref('recruitment_management.recruitment_request_action').id, recruitment_request.id)"/>
+                    </t>
+                </t>
+
+                <style>
+                    .detail-card {
+                        border: none;
+                        border-radius: 16px;
+                        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+                        margin-bottom: 1rem;
+                        background: white;
+                        overflow: hidden;
+                        transition: box-shadow 0.3s ease;
+                    }
+                    .detail-card:hover {
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+                    }
+                    .detail-header {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        border-radius: 16px 16px 0 0;
+                    }
+                    .info-badge {
+                        background-color: rgba(255, 255, 255, 0.25);
+                        backdrop-filter: blur(10px);
+                        padding: 0.35rem 0.75rem;
+                        border-radius: 20px;
+                        font-size: 0.8rem;
+                        font-weight: 500;
+                        border: 1px solid rgba(255, 255, 255, 0.3);
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 0.35rem;
+                    }
+                    .section-title {
+                        color: #2d3748;
+                        font-weight: 700;
+                        padding-bottom: 0.5rem;
+                        border-bottom: 2px solid #e2e8f0;
+                        font-size: 1.1rem;
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    }
+                    .status-badge-large {
+                        padding: 0.5rem 1.25rem;
+                        border-radius: 25px;
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        letter-spacing: 0.3px;
+                        text-transform: uppercase;
+                    }
+                    .job-position-card {
+                        background: white;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 12px;
+                        padding: 1.25rem;
+                        transition: all 0.3s ease;
+                    }
+                    .job-position-card:hover {
+                        border-color: #667eea;
+                        box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+                    }
+                    .job-position-header {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        padding: 0.75rem 1rem;
+                        margin: -1.25rem -1.25rem 1rem -1.25rem;
+                        border-radius: 11px 11px 0 0;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    .job-position-number {
+                        font-size: 1rem;
+                        font-weight: 600;
+                    }
+                    details summary {
+                        list-style: none;
+                    }
+                    details summary::-webkit-details-marker {
+                        display: none;
+                    }
+                    details[open] summary i.fa-chevron-right {
+                        transform: rotate(90deg);
+                    }
+                    details summary i.fa-chevron-right {
+                        transition: transform 0.3s ease;
+                    }
+                </style>
+
+                <!-- Two Column Layout: Main Content + Sidebar -->
+                <div class="row mt-4">
+                    <!-- Main Content (Left - 8 columns) -->
+                    <div class="col-lg-8 mb-4">
+                        <div class="detail-card">
+                            <!-- Compact Header -->
+                            <div class="detail-header py-4 px-4">
+                                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                                    <div>
+                                        <h3 class="mb-2">
+                                            <i class="fa fa-briefcase me-2"/>
+                                            <t t-out="recruitment_request.name"/>
+                                        </h3>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <span class="info-badge">
+                                                <i class="fa fa-map-marker me-1"/>
+                                                <t t-out="recruitment_request.work_location"/>
+                                            </span>
+                                            <span class="info-badge" t-if="recruitment_request.remote_work">
+                                                <i class="fa fa-home me-1"/>
+                                                Remote
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span t-attf-class="status-badge-large badge #{
+                                        'bg-secondary' if recruitment_request.state == 'draft' else
+                                        'bg-info' if recruitment_request.state in ['submitted', 'under_review'] else
+                                        'bg-warning text-dark' if recruitment_request.state == 'quotation_sent' else
+                                        'bg-success' if recruitment_request.state in ['approved', 'in_progress'] else
+                                        'bg-primary' if recruitment_request.state == 'completed' else
+                                        'bg-danger'
+                                    }">
+                                        <t t-out="dict(recruitment_request._fields['state'].selection).get(recruitment_request.state)"/>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="card-body p-4">
+                                <!-- Alert for Quick Submit Requests (no job lines) -->
+                                <t t-if="not recruitment_request.line_ids and recruitment_request.state in ['submitted', 'under_review']">
+                                    <div class="alert alert-info d-flex align-items-start mb-3" role="alert">
+                                            <i class="fa fa-check-circle fa-2x me-3 mt-1"/>
+                                            <div class="flex-grow-1">
+                                                <h5 class="alert-heading mb-2">
+                                                    <i class="fa fa-paper-plane me-1"/>
+                                                    Request Submitted Successfully!
+                                                </h5>
+                                                <p class="mb-2">
+                                                    Thank you for your quick request! We've received your requirements and created a lead for our recruitment team to follow up.
+                                                </p>
+                                                <p class="mb-0">
+                                                    <strong>Your Requirements:</strong>
+                                                </p>
+                                                <div class="mt-2 p-3" style="background-color: rgba(255,255,255,0.7); border-radius: 8px;">
+                                                    <pre style="white-space: pre-wrap; font-family: inherit; margin: 0;"><t t-out="recruitment_request.internal_notes or 'No description provided'"/></pre>
+                                                </div>
+                                                <hr class="my-3"/>
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p class="mb-2">
+                                                            <i class="fa fa-lightbulb-o text-warning me-1"/>
+                                                            <strong>What happens next?</strong>
+                                                        </p>
+                                                        <ul class="mb-0">
+                                                            <li>Our team will review your requirements</li>
+                                                            <li>We'll contact you to discuss details</li>
+                                                            <li>We'll create the job positions for you</li>
+                                                            <li>You'll be notified at each step</li>
+                                                        </ul>
+                                                    </div>
+                                                    <div class="col-md-6" t-if="recruitment_request.lead_id">
+                                                        <p class="mb-2">
+                                                            <i class="fa fa-bullhorn text-info me-1"/>
+                                                            <strong>CRM Lead Created</strong>
+                                                        </p>
+                                                        <p class="mb-0">
+                                                            Reference: <strong t-out="recruitment_request.lead_id.name"/>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </t>
+
+
+                                <!-- Job Positions -->
+                                <t t-if="recruitment_request.line_ids">
+                                    <h5 class="section-title mb-3">
+                                        <i class="fa fa-briefcase me-2"/>
+                                        Job Positions
+                                    </h5>
+
+                                    <t t-foreach="recruitment_request.line_ids" t-as="line">
+                                        <div class="job-position-card mb-3">
+                                            <div class="job-position-header">
+                                                <div class="job-position-number">
+                                                    <t t-out="line.job_title"/>
+                                                </div>
+                                                <span class="badge bg-light text-dark">
+                                                    <t t-out="line.no_of_positions"/> Position<t t-if="line.no_of_positions > 1">s</t>
+                                                </span>
+                                            </div>
+
+                                            <!-- Compact Info Grid -->
+                                            <div class="row g-2 mb-2">
+                                                <div class="col-6" t-if="line.department_id">
+                                                    <small class="text-muted d-block"><i class="fa fa-sitemap me-1"/>Department</small>
+                                                    <div class="fw-bold" t-out="line.department_id.name"/>
+                                                </div>
+                                                <div class="col-6" t-if="line.emp_contract_type">
+                                                    <small class="text-muted d-block"><i class="fa fa-file-text me-1"/>Contract</small>
+                                                    <div class="fw-bold" t-out="line.emp_contract_type.name"/>
+                                                </div>
+                                                <div class="col-6" t-if="line.expected_degree">
+                                                    <small class="text-muted d-block"><i class="fa fa-graduation-cap me-1"/>Education</small>
+                                                    <div class="fw-bold" t-out="line.expected_degree.name"/>
+                                                </div>
+                                                <div class="col-6">
+                                                    <small class="text-muted d-block"><i class="fa fa-clock-o me-1"/>Experience</small>
+                                                    <div class="fw-bold">
+                                                        <t t-out="line.experience_years"/> year<t t-if="line.experience_years != 1">s</t>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-2" t-if="line.job_skill_ids">
+                                                <small class="text-muted d-block mb-1"><i class="fa fa-wrench me-1"/>Skills</small>
+                                                <div>
+                                                    <t t-foreach="line.job_skill_ids" t-as="skill">
+                                                        <span class="badge bg-primary me-1 mb-1" style="font-size: 0.75rem;" t-out="skill.name"/>
+                                                    </t>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-2" t-if="line.salary_from or line.salary_to">
+                                                <small class="text-muted d-block mb-1"><i class="fa fa-dollar me-1"/>Salary Range</small>
+                                                <div class="fw-bold">
+                                                    <span t-if="line.salary_from" t-field="line.salary_from" t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+                                                    <t t-if="line.salary_from and line.salary_to"> - </t>
+                                                    <span t-if="line.salary_to" t-field="line.salary_to" t-options='{"widget": "monetary", "display_currency": line.currency_id}'/>
+                                                </div>
+                                            </div>
+
+                                            <details class="mt-2" t-if="line.job_description or line.requirements">
+                                                <summary class="cursor-pointer text-primary" style="cursor: pointer;">
+                                                    <i class="fa fa-chevron-right me-1"/>View Details
+                                                </summary>
+                                                <div class="mt-2 p-3 bg-light rounded">
+                                                    <div class="mb-2" t-if="line.job_description">
+                                                        <strong class="d-block mb-1"><i class="fa fa-align-left me-1"/>Description</strong>
+                                                        <div t-field="line.job_description" style="font-size: 0.9rem;"/>
+                                                    </div>
+                                                    <div t-if="line.requirements">
+                                                        <strong class="d-block mb-1"><i class="fa fa-check-square-o me-1"/>Requirements</strong>
+                                                        <div t-field="line.requirements" style="font-size: 0.9rem;"/>
+                                                    </div>
+                                                </div>
+                                            </details>
+                                        </div>
+                                    </t>
+                                </t>
+
+                                <!-- Benefits & Perks -->
+                                <div t-if="recruitment_request.benefits">
+                                    <h5 class="section-title mb-2">
+                                        <i class="fa fa-gift me-2"/>
+                                        Benefits &amp; Perks
+                                    </h5>
+                                    <div class="p-3 bg-light rounded">
+                                        <div t-field="recruitment_request.benefits" style="font-size: 0.9rem;"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                                <!-- Action Buttons -->
+                                <div class="action-buttons">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <a href="/my/recruitment" class="btn btn-outline-secondary">
+                                            <i class="fa fa-arrow-left me-1"/>
+                                            Back to List
+                                        </a>
+
+                                        <div class="d-flex gap-2">
+                                            <!-- Only show Edit for requests with job lines -->
+                                            <t t-if="recruitment_request.state in ['draft', 'submitted', 'under_review', 'quotation_sent'] and recruitment_request.line_ids">
+                                                <a t-attf-href="/my/recruitment/#{recruitment_request.id}/edit"
+                                                   class="btn btn-outline-primary">
+                                                    <i class="fa fa-edit me-1"/>
+                                                    Edit Request
+                                                </a>
+                                            </t>
+
+                                            <!-- Show Submit button only if in draft AND has job lines -->
+                                            <t t-if="recruitment_request.state == 'draft' and recruitment_request.line_ids">
+                                                <a t-attf-href="/my/recruitment/#{recruitment_request.id}/submit"
+                                                   class="btn btn-primary">
+                                                    <i class="fa fa-paper-plane me-1"/>
+                                                    Submit Request
+                                                </a>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <!-- End Main Content -->
+
+                    <!-- Sidebar (Right - 4 columns) -->
+                    <div class="col-lg-4 mb-4">
+                        <div class="sticky-top" style="top: 20px;">
+                            <!-- Company Info Card -->
+                            <div class="detail-card mb-3">
+                                <div class="card-body p-3">
+                                    <h6 class="fw-bold mb-3 d-flex align-items-center">
+                                        <i class="fa fa-building me-2 text-primary"/>
+                                        Company Info
+                                    </h6>
+                                    <div class="mb-2">
+                                        <small class="text-muted d-block">Company</small>
+                                        <div class="fw-bold" t-out="recruitment_request.partner_id.name"/>
+                                    </div>
+                                    <div class="mb-2" t-if="recruitment_request.contact_person_id">
+                                        <small class="text-muted d-block">Contact</small>
+                                        <div class="fw-bold" t-out="recruitment_request.contact_person_id.name"/>
+                                    </div>
+                                    <div class="mb-2" t-if="recruitment_request.submission_date">
+                                        <small class="text-muted d-block">Submitted</small>
+                                        <div class="fw-bold">
+                                            <span t-field="recruitment_request.submission_date" t-options='{"widget": "date"}'/>
+                                        </div>
+                                    </div>
+                                    <div t-if="recruitment_request.expected_start_date">
+                                        <small class="text-muted d-block">Expected Start</small>
+                                        <div class="fw-bold">
+                                            <span t-field="recruitment_request.expected_start_date" t-options='{"widget": "date"}'/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quick Stats Card -->
+                            <div class="detail-card mb-3">
+                                <div class="card-body p-3">
+                                    <h6 class="fw-bold mb-3 d-flex align-items-center">
+                                        <i class="fa fa-chart-bar me-2 text-success"/>
+                                        Quick Stats
+                                    </h6>
+                                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                        <span><i class="fa fa-briefcase me-1 text-primary"/>Positions</span>
+                                        <span class="badge bg-primary"><t t-out="len(recruitment_request.line_ids)"/></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                        <span><i class="fa fa-users me-1 text-info"/>Total Spots</span>
+                                        <span class="badge bg-info"><t t-out="recruitment_request.no_of_positions"/></span>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center" t-if="recruitment_request.applicant_count > 0">
+                                        <span><i class="fa fa-user-plus me-1 text-success"/>Applicants</span>
+                                        <span class="badge bg-success"><t t-out="recruitment_request.applicant_count"/></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Actions Card -->
+                            <div class="detail-card mb-3">
+                                <div class="card-body p-3">
+                                    <h6 class="fw-bold mb-3 d-flex align-items-center">
+                                        <i class="fa fa-bolt me-2 text-warning"/>
+                                        Quick Actions
+                                    </h6>
+                                    <div class="d-grid gap-2">
+                                        <a href="/my/recruitment" class="btn btn-sm btn-outline-secondary">
+                                            <i class="fa fa-arrow-left me-1"/>
+                                            Back to List
+                                        </a>
+                                        <t t-if="recruitment_request.applicant_count > 0">
+                                            <a t-attf-href="/my/recruitment/#{recruitment_request.id}/applicants" class="btn btn-sm btn-primary">
+                                                <i class="fa fa-users me-1"/>
+                                                View Applicants
+                                            </a>
+                                        </t>
+                                        <t t-if="recruitment_request.state in ['draft', 'submitted', 'under_review', 'quotation_sent'] and recruitment_request.line_ids">
+                                            <a t-attf-href="/my/recruitment/#{recruitment_request.id}/edit" class="btn btn-sm btn-outline-primary">
+                                                <i class="fa fa-edit me-1"/>
+                                                Edit Request
+                                            </a>
+                                        </t>
+                                        <t t-if="recruitment_request.state == 'draft' and recruitment_request.line_ids">
+                                            <a t-attf-href="/my/recruitment/#{recruitment_request.id}/submit" class="btn btn-sm btn-success">
+                                                <i class="fa fa-paper-plane me-1"/>
+                                                Submit Request
+                                            </a>
+                                        </t>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Sidebar -->
+                </div>
+
+                <!-- Chatter (Full Width Below) -->
+                <div class="detail-card mt-3">
+                    <div class="card-body p-4">
+                        <h5 class="section-title mb-3">
+                            <i class="fa fa-comments me-2"/>
+                            Communication
+                        </h5>
+                        <t t-call="portal.message_thread">
+                            <t t-set="object" t-value="recruitment_request"/>
+                        </t>
+                    </div>
+                </div>
+            </t>
+        </t>
+    </template>
+
+ <!-- Portal - Create New Recruitment Request Form -->
+<template id="portal_create_recruitment_request" name="Create Recruitment Request">
+    <t t-if="request.env.user.partner_id.user_type == 'employer'">
+        <t t-call="portal.portal_layout">
+
+            <style>
+                .section-card {
+                    border: none;
+                    border-radius: 20px;
+                    margin-bottom: 2rem;
+                    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+                    background: white;
+                    overflow: hidden;
+                    position: relative;
+                }
+                .section-card::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 5px;
+                    height: 100%;
+                    background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+                }
+                .section-card:hover {
+                    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+                    transform: translateY(-4px);
+                }
+                .section-header {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 2.5rem 2rem;
+                    border-radius: 20px;
+                    margin-bottom: 2.5rem;
+                    position: relative;
+                    overflow: hidden;
+                    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+                }
+                .section-header::before {
+                    content: '';
+                    position: absolute;
+                    top: -50%;
+                    right: -20%;
+                    width: 200px;
+                    height: 200px;
+                    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+                    border-radius: 50%;
+                    animation: float 6s ease-in-out infinite;
+                }
+                @keyframes float {
+                    0%, 100% { transform: translate(0, 0); }
+                    50% { transform: translate(-20px, 20px); }
+                }
+                .form-label {
+                    font-weight: 600;
+                    color: #2d3748;
+                    margin-bottom: 0.75rem;
+                    font-size: 0.95rem;
+                    letter-spacing: 0.3px;
+                }
+                .form-control, .form-select {
+                    border: 2px solid #e2e8f0;
+                    border-radius: 12px;
+                    padding: 0.75rem 1rem;
+                    transition: all 0.3s ease;
+                    font-size: 0.95rem;
+                }
+                .form-control:focus, .form-select:focus {
+                    border-color: #667eea;
+                    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+                    transform: translateY(-2px);
+                }
+                .input-group-text {
+                    background: linear-gradient(145deg, #f7fafc 0%, #edf2f7 100%);
+                    border: 2px solid #e2e8f0;
+                    border-right: none;
+                    border-radius: 12px 0 0 12px;
+                    color: #667eea;
+                    font-weight: 600;
+                }
+                .input-group .form-control {
+                    border-left: none;
+                    border-radius: 0 12px 12px 0;
+                }
+                .input-group:focus-within .input-group-text {
+                    border-color: #667eea;
+                    background: linear-gradient(145deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                }
+                .required-field::after {
+                    content: " *";
+                    color: #f56565;
+                    font-weight: 700;
+                }
+                .info-text {
+                    font-size: 0.85rem;
+                    color: #718096;
+                    font-style: italic;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    margin-top: 0.5rem;
+                }
+                .info-text::before {
+                    content: '💡';
+                    font-style: normal;
+                }
+                .job-position-card {
+                    border: 2px solid #e2e8f0;
+                    border-radius: 20px;
+                    padding: 2rem;
+                    margin-bottom: 2rem;
+                    position: relative;
+                    background: linear-gradient(145deg, #ffffff 0%, #f7fafc 100%);
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+                }
+                .job-position-card:hover {
+                    border-color: #667eea;
+                    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+                    transform: scale(1.01);
+                }
+                .job-position-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 1.5rem;
+                    padding: 1.25rem 1.5rem;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border-radius: 16px;
+                    color: white;
+                    margin: -2rem -2rem 1.5rem -2rem;
+                }
+                .job-position-number {
+                    font-size: 1.25rem;
+                    font-weight: 700;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                }
+                .remove-job-btn {
+                    background: rgba(239, 68, 68, 0.9);
+                    color: white;
+                    border: none;
+                    padding: 0.5rem 1rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 0.9rem;
+                    font-weight: 600;
+                    transition: all 0.3s ease;
+                }
+                .remove-job-btn:hover {
+                    background: #dc2626;
+                    transform: scale(1.05);
+                }
+                .add-job-btn {
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    color: white;
+                    border: none;
+                    padding: 1rem 2rem;
+                    border-radius: 16px;
+                    cursor: pointer;
+                    font-weight: 700;
+                    font-size: 1rem;
+                    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+                    transition: all 0.3s ease;
+                }
+                .add-job-btn:hover {
+                    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+                    transform: translateY(-3px);
+                }
+                button[name="button_submit"]:disabled,
+                button[name="button_submit"].disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                    pointer-events: none;
+                    background-color: #6c757d !important;
+                    border-color: #6c757d !important;
+                }
+                .btn-primary {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    border: none;
+                    border-radius: 12px;
+                    padding: 0.75rem 1.5rem;
+                    font-weight: 600;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                }
+                .btn-primary:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+                }
+                .btn-outline-primary {
+                    border: 2px solid #667eea;
+                    color: #667eea;
+                    border-radius: 12px;
+                    padding: 0.75rem 1.5rem;
+                    font-weight: 600;
+                    background: white;
+                    transition: all 0.3s ease;
+                }
+                .btn-outline-primary:hover {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    border-color: transparent;
+                    transform: translateY(-2px);
+                }
+                .btn-secondary {
+                    border-radius: 12px;
+                    padding: 0.75rem 1.5rem;
+                    font-weight: 600;
+                    transition: all 0.3s ease;
+                }
+            </style>
+
+            <style>
+                /* Mobile-First Responsive Improvements */
+                @media (max-width: 768px) {
+                    .section-header {
+                        padding: 2rem 1.5rem;
+                    }
+                    .section-card {
+                        margin-bottom: 1.5rem;
+                    }
+                    .job-position-card {
+                        padding: 1.5rem;
+                    }
+                    .job-position-header {
+                        flex-direction: column;
+                        gap: 1rem;
+                        text-align: center;
+                    }
+                    .form-control, .form-select {
+                        font-size: 16px; /* Prevents zoom on iOS */
+                    }
+                }
+
+                /* Dark mode friendly adjustments */
+                @media (prefers-color-scheme: dark) {
+                    .section-card {
+                        background: linear-gradient(145deg, #1a202c 0%, #2d3748 100%);
+                        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+                    }
+                    .form-control, .form-select {
+                        background-color: #2d3748;
+                        border-color: #4a5568;
+                        color: #e2e8f0;
+                    }
+                    .form-control:focus, .form-select:focus {
+                        background-color: #374151;
+                    }
+                    .form-label {
+                        color: #e2e8f0;
+                    }
+                    .info-text {
+                        color: #a0aec0;
+                    }
+                    .job-position-card {
+                        background: linear-gradient(145deg, #2d3748 0%, #374151 100%);
+                        border-color: #4a5568;
+                    }
+                }
+
+                /* Smooth scroll behavior */
+                html {
+                    scroll-behavior: smooth;
+                }
+
+                /* Accessibility improvements */
+                .form-control:focus, .form-select:focus, .btn:focus {
+                    outline: 3px solid rgba(102, 126, 234, 0.5);
+                    outline-offset: 2px;
+                }
+
+                /* Loading states */
+                @keyframes shimmer {
+                    0% { background-position: -1000px 0; }
+                    100% { background-position: 1000px 0; }
+                }
+            </style>
+
+            <div class="container mt-4 mb-5">
+                <div class="row">
+                    <div class="col-lg-10 offset-lg-1">
+                        <!-- Header -->
+                        <div class="section-header text-center position-relative">
+                            <i class="fa fa-briefcase fa-3x mb-3 position-relative" style="z-index: 1;"/>
+                            <h2 class="mb-2 position-relative" style="z-index: 1;">Create New Recruitment Request</h2>
+                            <p class="mb-0 position-relative opacity-90" style="z-index: 1;">Fill in the details to find the perfect candidate for your team</p>
+                        </div>
+
+                        <form action="/my/recruitment/create" method="POST" class="needs-validation" novalidate="novalidate" id="recruitment_form">
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+
+                            <!-- Common Information Section -->
+                            <div class="card section-card shadow-sm">
+                                <div class="card-body p-4">
+                                    <h4 class="mb-3">
+                                        <i class="fa fa-building text-primary me-2"/>
+                                        General Request Information
+                                    </h4>
+
+                                    <!-- Row 1: Work Location and Expected Start Date -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="work_location" class="form-label required-field">Work Location</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa fa-map-marker"/></span>
+                                                <input type="text" class="form-control" name="work_location" required="required"
+                                                       placeholder="e.g., DUBAI, UAE"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 mb-3">
+                                            <label for="expected_start_date" class="form-label">Expected Start Date</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa fa-calendar"/></span>
+                                                <input type="text" class="form-control date-input" name="expected_start_date" placeholder="Select date"
+                                                       onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Row 2: Remote Work Checkbox -->
+                                    <div class="mb-3">
+                                        <div class="form-check form-switch">
+                                            <input type="checkbox" class="form-check-input" name="remote_work" id="remote_work" value="1" style="cursor: pointer;"/>
+                                            <label class="form-check-label" for="remote_work" style="cursor: pointer;">
+                                                <i class="fa fa-home text-success me-1"/>
+                                                Remote Work Available
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Row 3: Benefits (Full Width) -->
+                                    <div class="mb-3">
+                                        <label for="benefits" class="form-label">Benefits &amp; Perks</label>
+                                        <textarea class="form-control" name="benefits" rows="3"
+                                                  placeholder="e.g., Health insurance, Dental coverage, 401(k) matching, Flexible hours..."></textarea>
+                                        <small class="info-text">Include health benefits, time off, bonuses, and other perks</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Job Positions Section -->
+                            <div class="card section-card shadow-sm">
+                                <div class="card-body p-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <h4 class="mb-0">
+                                            <i class="fa fa-briefcase text-primary me-2"/>
+                                            Job Positions
+                                        </h4>
+                                        <button type="button" class="add-job-btn" onclick="addJobPosition()">
+                                            <i class="fa fa-plus me-1"/>Add Another Job Position
+                                        </button>
+                                    </div>
+
+                                    <div id="job_positions_container"></div>
+                                </div>
+                            </div>
+
+                            <!-- Hidden template for job position (will be cloned by JavaScript) -->
+                            <div id="job_position_template" style="display: none;">
+                                <div class="job-position-card">
+                                    <div class="job-position-header">
+                                        <div class="job-position-number">Position <span class="position-num">1</span></div>
+                                        <button type="button" class="remove-job-btn" onclick="removeJobPosition(this)">
+                                            <i class="fa fa-times me-1"/>Remove
+                                        </button>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label required-field">Job Title</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fa fa-tag"/></span>
+                                            <input type="text" class="form-control" name="job_lines[INDEX][job_title]" required="required"
+                                                   placeholder="e.g., Senior Software Engineer"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <label class="form-label">Department</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa fa-sitemap"/></span>
+                                                <select class="form-select" name="job_lines[INDEX][department_id]" style="border-left: 1px solid #ced4da;">
+                                                    <option value="">Select department...</option>
+                                                    <t t-foreach="departments" t-as="dept">
+                                                        <option t-att-value="dept.id">
+                                                            <t t-esc="dept.name"/>
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <label class="form-label required-field">Number of Positions</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa fa-users"/></span>
+                                                <input type="number" class="form-control" name="job_lines[INDEX][no_of_positions]"
+                                                       value="1" min="1" required="required"/>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label required-field">Contract Type</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fa fa-file-text"/></span>
+                                            <select class="form-select" name="job_lines[INDEX][emp_contract_type]" required="required" style="border-left: 1px solid #ced4da;">
+                                                <option value="">Select contract type...</option>
+                                                <t t-foreach="emp_contract_type" t-as="ct">
+                                                    <option t-att-value="ct.id">
+                                                        <t t-esc="ct.name"/>
+                                                    </option>
+                                                </t>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label required-field">Job Description</label>
+                                        <textarea class="form-control" name="job_lines[INDEX][job_description]" rows="5"
+                                                  required="required"
+                                                  placeholder="Provide a detailed description of the role, key responsibilities, and what makes this opportunity exciting..."></textarea>
+                                        <small class="info-text">Be specific about daily tasks and team dynamics</small>
+                                    </div>
+
+                                    <div class="mb-4">
+                                        <label class="form-label">Requirements &amp; Qualifications</label>
+                                        <textarea class="form-control" name="job_lines[INDEX][requirements]" rows="4"
+                                                  placeholder="List the essential qualifications, certifications, and experience needed..."></textarea>
+                                        <small class="info-text">Include both must-have and nice-to-have qualifications</small>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <label class="form-label">Minimum Education Level</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa fa-certificate"/></span>
+                                                <select class="form-select" name="job_lines[INDEX][expected_degree]" style="border-left: 1px solid #ced4da;">
+                                                    <option value="">Not Specified</option>
+                                                    <t t-foreach="degrees" t-as="deg">
+                                                        <option t-att-value="deg.id">
+                                                            <t t-esc="deg.name"/>
+                                                        </option>
+                                                    </t>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
+                                            <label class="form-label">Required Experience (Years)</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa fa-clock-o"/></span>
+                                                <input type="number" class="form-control" name="job_lines[INDEX][experience_years]" value="0" min="0"/>
+                                                <span class="input-group-text">years</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Skills Selection for this job -->
+                                    <div class="mb-4">
+                                        <label class="form-label">Required Skills</label>
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <div class="row g-3 mb-3">
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Skill Category</label>
+                                                        <select class="form-select skill_type_select">
+                                                            <option value="">Select Category...</option>
+                                                            <t t-foreach="skill_types" t-as="st">
+                                                                <option t-att-value="st.id" t-esc="st.name"/>
+                                                            </t>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-5">
+                                                        <label class="form-label">Skill</label>
+                                                        <select class="form-select skill_select" disabled="disabled">
+                                                            <option value="">Select Skill...</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-3 d-flex align-items-end">
+                                                        <button type="button" class="btn btn-primary w-100 add_skill_btn" disabled="disabled">
+                                                            <i class="fa fa-plus me-1"/>Add
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="selected_skills_container">
+                                                    <label class="form-label">Selected Skills:</label>
+                                                    <div class="skills_badges d-flex flex-wrap gap-2"></div>
+                                                    <input type="hidden" name="job_lines[INDEX][job_skill_ids]" class="job_skill_ids_input" value=""/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <small class="info-text">Select category first, then choose skills to add</small>
+                                    </div>
+
+                                    <!-- Salary Range for this job -->
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Minimum Salary</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa fa-dollar"/></span>
+                                                <input type="number" class="form-control" name="job_lines[INDEX][salary_from]" placeholder="e.g., 50000"/>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Maximum Salary</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i class="fa fa-dollar"/></span>
+                                                <input type="number" class="form-control" name="job_lines[INDEX][salary_to]" placeholder="e.g., 80000"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- JavaScript for dynamic job positions and skills -->
+                            <script>
+                                let jobPositionIndex = 0;
+
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    // Add first job position on load
+                                    addJobPosition();
+
+                                    // Get submit button
+                                    const submitBtn = document.querySelector('button[name="button_submit"]');
+                                    const form = document.getElementById('recruitment_form');
+
+                                    // Function to validate all required fields
+                                    function validateForm() {
+                                        const workLocation = document.querySelector('input[name="work_location"]');
+                                        const container = document.getElementById('job_positions_container');
+                                        const jobs = container.querySelectorAll('[id^="job_position_"]');
+
+                                        // Check work location (required)
+                                        if (!workLocation || !workLocation.value.trim()) {
+                                            return false;
+                                        }
+
+                                        // Check if at least one job has all required fields filled
+                                        let hasValidJob = false;
+                                        jobs.forEach(job => {
+                                            const jobTitle = job.querySelector('input[name*="[job_title]"]');
+                                            const contractType = job.querySelector('select[name*="[emp_contract_type]"]');
+                                            const numPositions = job.querySelector('input[name*="[no_of_positions]"]');
+                                            const description = job.querySelector('textarea[name*="[job_description]"]');
+
+                                            if (jobTitle &amp;&amp; jobTitle.value.trim() !== '' &amp;&amp;
+                                                contractType &amp;&amp; contractType.value !== '' &amp;&amp;
+                                                numPositions &amp;&amp; numPositions.value &amp;&amp; parseInt(numPositions.value) > 0 &amp;&amp;
+                                                description &amp;&amp; description.value.trim() !== '') {
+                                                hasValidJob = true;
+                                            }
+                                        });
+
+                                        return hasValidJob;
+                                    }
+
+                                    // Function to update submit button state
+                                    function updateSubmitButton() {
+                                        if (submitBtn) {
+                                            const isValid = validateForm();
+                                            submitBtn.disabled = !isValid;
+                                            if (isValid) {
+                                                submitBtn.classList.remove('disabled');
+                                            } else {
+                                                submitBtn.classList.add('disabled');
+                                            }
+                                        }
+                                    }
+
+                                    // Initial button state
+                                    updateSubmitButton();
+
+                                    // Add event listeners to all form inputs
+                                    if (form) {
+                                        form.addEventListener('input', updateSubmitButton);
+                                        form.addEventListener('change', updateSubmitButton);
+
+                                        // Add form validation on submit
+                                        form.addEventListener('submit', function(e) {
+                                            const clickedButton = document.activeElement;
+
+                                            // Only validate if submit button was clicked (not save draft)
+                                            if (clickedButton &amp;&amp; clickedButton.name === 'button_submit') {
+                                                if (!validateForm()) {
+                                                    e.preventDefault();
+                                                    alert('Please fill in all required fields:\n- Work Location\n- At least one job position with: Job Title, Number of Positions, Contract Type, and Job Description');
+                                                    return false;
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+
+                                function addJobPosition() {
+                                    const container = document.getElementById('job_positions_container');
+                                    const template = document.getElementById('job_position_template');
+                                    const clone = template.cloneNode(true);
+
+                                    clone.style.display = 'block';
+                                    clone.id = `job_position_${jobPositionIndex}`;
+                                    clone.removeAttribute('id');
+
+                                    // Get the inner div (job-position-card)
+                                    const card = clone.querySelector('.job-position-card');
+                                    if (!card) {
+                                        console.error('No job-position-card found in template');
+                                        return;
+                                    }
+
+                                    // Create wrapper div with proper ID
+                                    const wrapper = document.createElement('div');
+                                    wrapper.id = `job_position_${jobPositionIndex}`;
+                                    wrapper.appendChild(card);
+
+                                    // Replace INDEX in all name attributes
+                                    const inputs = wrapper.querySelectorAll('input, select, textarea');
+                                    inputs.forEach(input => {
+                                        if (input.name &amp;&amp; input.name.includes('INDEX')) {
+                                            input.name = input.name.replace(/INDEX/g, jobPositionIndex);
+                                        }
+                                    });
+
+                                    // Update position number
+                                    const posNumSpan = wrapper.querySelector('.position-num');
+                                    if (posNumSpan) {
+                                        posNumSpan.textContent = jobPositionIndex + 1;
+                                    }
+
+                                    container.appendChild(wrapper);
+
+                                    // Setup skills management for this job position
+                                    setupSkillsForJob(wrapper, jobPositionIndex);
+
+                                    // Hide remove button if only one job
+                                    updateRemoveButtons();
+
+                                    jobPositionIndex++;
+
+                                    // Trigger validation after adding new position
+                                    const submitBtn = document.querySelector('button[name="button_submit"]');
+                                    if (submitBtn) {
+                                        const event = new Event('input', { bubbles: true });
+                                        document.getElementById('recruitment_form').dispatchEvent(event);
+                                    }
+                                }
+
+                                function removeJobPosition(btn) {
+                                    const jobCard = btn.closest('.job-position-card').parentElement;
+                                    jobCard.remove();
+                                    updateRemoveButtons();
+                                    updatePositionNumbers();
+
+                                    // Trigger validation after removing position
+                                    const submitBtn = document.querySelector('button[name="button_submit"]');
+                                    if (submitBtn) {
+                                        const event = new Event('input', { bubbles: true });
+                                        document.getElementById('recruitment_form').dispatchEvent(event);
+                                    }
+                                }
+
+                                function updateRemoveButtons() {
+                                    const container = document.getElementById('job_positions_container');
+                                    const jobs = container.querySelectorAll('[id^="job_position_"]');
+                                    jobs.forEach((job, index) => {
+                                        const removeBtn = job.querySelector('.remove-job-btn');
+                                        if (removeBtn) {
+                                            removeBtn.style.display = jobs.length === 1 ? 'none' : 'inline-block';
+                                        }
+                                    });
+                                }
+
+                                function updatePositionNumbers() {
+                                    const container = document.getElementById('job_positions_container');
+                                    const jobs = container.querySelectorAll('[id^="job_position_"]');
+                                    jobs.forEach((job, index) => {
+                                        const numSpan = job.querySelector('.position-num');
+                                        if (numSpan) {
+                                            numSpan.textContent = index + 1;
+                                        }
+                                    });
+                                }
+
+                                function setupSkillsForJob(jobElement, index) {
+                                    const skillTypeSelect = jobElement.querySelector('.skill_type_select');
+                                    const skillSelect = jobElement.querySelector('.skill_select');
+                                    const addBtn = jobElement.querySelector('.add_skill_btn');
+                                    const badgesContainer = jobElement.querySelector('.skills_badges');
+                                    const hiddenInput = jobElement.querySelector('.job_skill_ids_input');
+                                    let selectedSkills = [];
+
+                                    skillTypeSelect.addEventListener('change', async function() {
+                                        if (this.value) {
+                                            skillSelect.disabled = false;
+                                            try {
+                                                const response = await fetch('/my/recruitment/get_skills', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                    },
+                                                    body: JSON.stringify({
+                                                        jsonrpc: '2.0',
+                                                        method: 'call',
+                                                        params: {
+                                                            skill_type_id: this.value
+                                                        },
+                                                        id: Math.floor(Math.random() * 1000000)
+                                                    })
+                                                });
+                                                const data = await response.json();
+                                                const skills = data.result || [];
+                                                skillSelect.innerHTML = '<option value="">Select Skill...</option>';
+                                                skills.forEach(skill => {
+                                                    const option = document.createElement('option');
+                                                    option.value = skill.id;
+                                                    option.textContent = skill.name;
+                                                    skillSelect.appendChild(option);
+                                                });
+                                            } catch (error) {
+                                                console.error('Error fetching skills:', error);
+                                            }
+                                        } else {
+                                            skillSelect.disabled = true;
+                                            skillSelect.innerHTML = '<option value="">Select Skill...</option>';
+                                        }
+                                    });
+
+                                    skillSelect.addEventListener('change', function() {
+                                        addBtn.disabled = !this.value;
+                                    });
+
+                                    addBtn.addEventListener('click', function() {
+                                        const skillId = parseInt(skillSelect.value);
+                                        const skillName = skillSelect.options[skillSelect.selectedIndex].text;
+
+                                        if (!selectedSkills.includes(skillId)) {
+                                            selectedSkills.push(skillId);
+
+                                            const badge = document.createElement('span');
+                                            badge.className = 'badge bg-primary';
+                                            badge.innerHTML = `${skillName} <i class="fa fa-times ms-1" style="cursor:pointer"></i>`;
+                                            badge.id = `skill_badge_${index}_${skillId}`;
+                                            badge.querySelector('i').addEventListener('click', function() {
+                                                selectedSkills = selectedSkills.filter(id => id !== skillId);
+                                                badge.remove();
+                                                hiddenInput.value = selectedSkills.join(',');
+                                            });
+                                            badgesContainer.appendChild(badge);
+
+                                            hiddenInput.value = selectedSkills.join(',');
+                                        }
+
+                                        skillTypeSelect.value = '';
+                                        skillSelect.innerHTML = '<option value="">Select Skill...</option>';
+                                        skillSelect.disabled = true;
+                                        addBtn.disabled = true;
+                                    });
+                                }
+                            </script>
+
+                            <!-- Action Buttons -->
+                            <div class="card shadow-sm">
+                                <div class="card-body py-3 px-3">
+                                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                        <small class="text-muted">
+                                            <i class="fa fa-info-circle me-1"/>
+                                            Fields marked with <span class="text-danger">*</span> are required
+                                        </small>
+                                        <button type="submit" name="button_submit" class="btn btn-primary">
+                                            <i class="fa fa-paper-plane me-1"/>Submit Request
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+        </t>
+    </t>
+</template>
+
+    <!-- Portal - Edit Recruitment Request Form -->
+    <template id="portal_edit_recruitment_request" name="Edit Recruitment Request">
+        <t t-if="request.env.user.partner_id.user_type == 'employer'">
+            <t t-set="allowed_states" t-value="['draft', 'submitted', 'under_review', 'quotation_sent']"/>
+            <t t-if="recruitment_request.state in allowed_states">
+                <t t-call="portal.portal_layout">
+
+                    <style>
+                        .edit-section-card {
+                            border-left: 4px solid #28a745;
+                            margin-bottom: 2rem;
+                            transition: all 0.3s ease;
+                        }
+                        .edit-section-card:hover {
+                            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+                        }
+                        .edit-section-header {
+                            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+                            color: white;
+                            padding: 1.5rem;
+                            border-radius: 10px;
+                            margin-bottom: 2rem;
+                        }
+                        .current-value-badge {
+                            background-color: #e7f3ff;
+                            color: #0066cc;
+                            padding: 0.25rem 0.75rem;
+                            border-radius: 15px;
+                            font-size: 0.85rem;
+                            margin-left: 0.5rem;
+                        }
+                        .job-position-card {
+                            border: 2px solid #28a745;
+                            border-radius: 10px;
+                            padding: 1.5rem;
+                            margin-bottom: 1.5rem;
+                            position: relative;
+                            background-color: #f8fff8;
+                        }
+                        .job-position-header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            margin-bottom: 1rem;
+                            padding-bottom: 0.5rem;
+                            border-bottom: 2px solid #28a745;
+                        }
+                        .job-position-number {
+                            font-size: 1.2rem;
+                            font-weight: bold;
+                            color: #28a745;
+                        }
+                    </style>
+
+                    <div class="container mt-4 mb-5">
+                        <div class="row">
+                            <div class="col-lg-10 offset-lg-1">
+                                <!-- Back to List Button -->
+                                <div class="mb-3">
+                                    <a href="/my/recruitment" class="btn btn-outline-secondary">
+                                        <i class="fa fa-arrow-left me-1"/>
+                                        Back to List
+                                    </a>
+                                </div>
+
+                                <!-- Header -->
+                                <div class="edit-section-header text-center">
+                                    <i class="fa fa-edit fa-3x mb-3"/>
+                                    <h2 class="mb-2">Edit Recruitment Request</h2>
+                                    <p class="mb-2">
+                                        <span class="current-value-badge">
+                                            <i class="fa fa-file-text-o me-1"/>
+                                            <t t-out="recruitment_request.name"/>
+                                        </span>
+                                    </p>
+                                    <p class="mb-0">Update your recruitment request details</p>
+                                </div>
+
+                                <form action="/my/recruitment/update" method="POST" class="needs-validation" novalidate="novalidate">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="request_id" t-att-value="recruitment_request.id"/>
+
+                                    <!-- Common Information Section -->
+                                    <div class="card edit-section-card shadow-sm">
+                                        <div class="card-body p-4">
+                                            <h4 class="mb-3">
+                                                <i class="fa fa-building text-success me-2"/>
+                                                General Request Information
+                                            </h4>
+
+                                            <!-- Row 1: Work Location and Expected Start Date -->
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="work_location" class="form-label fw-bold">Work Location <span class="text-danger">*</span></label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fa fa-map-marker"/></span>
+                                                        <input type="text" class="form-control" name="work_location" required="required"
+                                                               t-att-value="recruitment_request.work_location"
+                                                               placeholder="e.g., DUBAI, UAE"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="expected_start_date" class="form-label fw-bold">Expected Start Date</label>
+                                                    <div class="input-group">
+                                                        <span class="input-group-text"><i class="fa fa-calendar"/></span>
+                                                        <input type="text" class="form-control date-input" name="expected_start_date" placeholder="Select date"
+                                                               t-att-value="recruitment_request.expected_start_date"
+                                                               onfocus="(this.type='date')" onblur="if(!this.value)this.type='text'"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Row 2: Remote Work Checkbox -->
+                                            <div class="mb-3">
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input" name="remote_work" id="remote_work" value="1"
+                                                           t-att-checked="'checked' if recruitment_request.remote_work else None"
+                                                           style="cursor: pointer;"/>
+                                                    <label class="form-check-label" for="remote_work" style="cursor: pointer;">
+                                                        <i class="fa fa-home text-success me-1"/>
+                                                        Remote Work Available
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <!-- Row 3: Benefits (Full Width) -->
+                                            <div class="mb-3">
+                                                <label for="benefits" class="form-label fw-bold">Benefits &amp; Perks</label>
+                                                <textarea class="form-control" name="benefits" rows="3"
+                                                          placeholder="e.g., Health insurance, Dental coverage, 401(k) matching..."><t t-out="recruitment_request.benefits"/></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Job Positions Section -->
+                                    <div class="card edit-section-card shadow-sm">
+                                        <div class="card-body p-4">
+                                            <h4 class="mb-4">
+                                                <i class="fa fa-briefcase text-success me-2"/>
+                                                Job Positions
+                                            </h4>
+
+                                            <div id="job-positions-container">
+                                                <t t-foreach="lines_cleaned" t-as="line">
+                                                    <t t-set="line_prefix" t-value="'line_ids[%s]' % line_index"/>
+                                                    <div class="job-position-card" t-att-data-line-id="line['id']">
+                                                        <input type="hidden" t-attf-name="{{line_prefix}}[id]" t-att-value="line['id']"/>
+
+                                                        <div class="job-position-header">
+                                                            <div class="job-position-number">
+                                                                <i class="fa fa-briefcase me-2"/>
+                                                                Position #<span class="position-number"><t t-out="line_index + 1"/></span>
+                                                            </div>
+                                                            <button type="button" class="btn btn-sm btn-danger" onclick="removeJobPosition(this)">
+                                                                <i class="fa fa-trash"/>
+                                                            </button>
+                                                        </div>
+
+                                                        <div class="row g-3">
+                                                            <div class="col-md-6">
+                                                                <label class="form-label fw-bold">Job Title <span class="text-danger">*</span></label>
+                                                                <input type="text" class="form-control"
+                                                                       t-attf-name="{{line_prefix}}[job_title]"
+                                                                       t-att-value="line['job_title']"
+                                                                       placeholder="e.g., Senior Software Engineer" required="required"/>
+                                                            </div>
+
+                                                            <div class="col-md-3">
+                                                                <label class="form-label fw-bold">No. of Positions <span class="text-danger">*</span></label>
+                                                                <input type="number" class="form-control"
+                                                                       t-attf-name="{{line_prefix}}[no_of_positions]"
+                                                                       t-att-value="line['no_of_positions']"
+                                                                       min="1" required="required"/>
+                                                            </div>
+
+                                                            <div class="col-md-3">
+                                                                <label class="form-label fw-bold">Experience (Years)</label>
+                                                                <input type="number" class="form-control"
+                                                                       t-attf-name="{{line_prefix}}[experience_years]"
+                                                                       t-att-value="line['experience_years']"
+                                                                       min="0"/>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <label class="form-label fw-bold">Salary From</label>
+                                                                <input type="number" class="form-control"
+                                                                       t-attf-name="{{line_prefix}}[salary_from]"
+                                                                       t-att-value="line['salary_from']"
+                                                                       min="0" step="1000"
+                                                                       placeholder="e.g., 80000"/>
+                                                            </div>
+
+                                                            <div class="col-md-6">
+                                                                <label class="form-label fw-bold">Salary To</label>
+                                                                <input type="number" class="form-control"
+                                                                       t-attf-name="{{line_prefix}}[salary_to]"
+                                                                       t-att-value="line['salary_to']"
+                                                                       min="0" step="1000"
+                                                                       placeholder="e.g., 120000"/>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-bold">Job Description</label>
+                                                                <textarea class="form-control"
+                                                                          t-attf-name="{{line_prefix}}[job_description]"
+                                                                          rows="3"
+                                                                          placeholder="Brief description of the role and responsibilities..."><t t-out="line['job_description'] or ''"/></textarea>
+                                                            </div>
+
+                                                            <div class="col-12">
+                                                                <label class="form-label fw-bold">Requirements &amp; Qualifications</label>
+                                                                <textarea class="form-control"
+                                                                          t-attf-name="{{line_prefix}}[requirements]"
+                                                                          rows="2"
+                                                                          placeholder="e.g., Bachelor's degree, 5+ years experience..."><t t-out="line['requirements'] or ''"/></textarea>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </t>
+                                            </div>
+
+                                            <!-- Add Position Button -->
+                                            <div class="text-center mt-3">
+                                                <button type="button" class="btn btn-success" onclick="addJobPosition()">
+                                                    <i class="fa fa-plus me-1"/>
+                                                    Add Position
+                                                </button>
+                                            </div>
+
+                                            <!-- Template for new job positions (hidden) -->
+                                            <div id="job-position-template" style="display: none;">
+                                                <div class="job-position-card">
+                                                    <input type="hidden" name="line_ids[__INDEX__][id]" value="0"/>
+
+                                                    <div class="job-position-header">
+                                                        <div class="job-position-number">
+                                                            <i class="fa fa-briefcase me-2"/>
+                                                            Position #<span class="position-number">__NUMBER__</span>
+                                                        </div>
+                                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeJobPosition(this)">
+                                                            <i class="fa fa-trash"/>
+                                                        </button>
+                                                    </div>
+
+                                                    <div class="row g-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label fw-bold">Job Title <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control"
+                                                                   name="line_ids[__INDEX__][job_title]"
+                                                                   placeholder="e.g., Senior Software Engineer" required="required"/>
+                                                        </div>
+
+                                                        <div class="col-md-3">
+                                                            <label class="form-label fw-bold">No. of Positions <span class="text-danger">*</span></label>
+                                                            <input type="number" class="form-control"
+                                                                   name="line_ids[__INDEX__][no_of_positions]"
+                                                                   value="1" min="1" required="required"/>
+                                                        </div>
+
+                                                        <div class="col-md-3">
+                                                            <label class="form-label fw-bold">Experience (Years)</label>
+                                                            <input type="number" class="form-control"
+                                                                   name="line_ids[__INDEX__][experience_years]"
+                                                                   value="0" min="0"/>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <label class="form-label fw-bold">Salary From</label>
+                                                            <input type="number" class="form-control"
+                                                                   name="line_ids[__INDEX__][salary_from]"
+                                                                   value="0" min="0" step="1000"
+                                                                   placeholder="e.g., 80000"/>
+                                                        </div>
+
+                                                        <div class="col-md-6">
+                                                            <label class="form-label fw-bold">Salary To</label>
+                                                            <input type="number" class="form-control"
+                                                                   name="line_ids[__INDEX__][salary_to]"
+                                                                   value="0" min="0" step="1000"
+                                                                   placeholder="e.g., 120000"/>
+                                                        </div>
+
+                                                        <div class="col-12">
+                                                            <label class="form-label fw-bold">Job Description</label>
+                                                            <textarea class="form-control"
+                                                                      name="line_ids[__INDEX__][job_description]"
+                                                                      rows="3"
+                                                                      placeholder="Brief description of the role and responsibilities..."></textarea>
+                                                        </div>
+
+                                                        <div class="col-12">
+                                                            <label class="form-label fw-bold">Requirements &amp; Qualifications</label>
+                                                            <textarea class="form-control"
+                                                                      name="line_ids[__INDEX__][requirements]"
+                                                                      rows="2"
+                                                                      placeholder="e.g., Bachelor's degree, 5+ years experience..."></textarea>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <script>
+                                                let positionCounter = <t t-out="len(lines_cleaned)"/>;
+
+                                                function addJobPosition() {
+                                                    positionCounter++;
+                                                    const template = document.getElementById('job-position-template').innerHTML;
+                                                    const newPosition = template.replace(/__INDEX__/g, positionCounter - 1).replace(/__NUMBER__/g, positionCounter);
+
+                                                    const container = document.getElementById('job-positions-container');
+                                                    container.insertAdjacentHTML('beforeend', newPosition);
+
+                                                    updatePositionNumbers();
+                                                }
+
+                                                function removeJobPosition(button) {
+                                                    const card = button.closest('.job-position-card');
+                                                    const lineId = card.getAttribute('data-line-id');
+
+                                                    // If has line_id, mark for deletion
+                                                    if (lineId) {
+                                                        const input = document.createElement('input');
+                                                        input.type = 'hidden';
+                                                        input.name = 'delete_line_ids[]';
+                                                        input.value = lineId;
+                                                        card.appendChild(input);
+                                                        card.style.display = 'none';
+                                                    } else {
+                                                        // New position, just remove
+                                                        card.remove();
+                                                    }
+
+                                                    updatePositionNumbers();
+                                                }
+
+                                                function updatePositionNumbers() {
+                                                    const cards = document.querySelectorAll('#job-positions-container .job-position-card:not([style*="display: none"])');
+                                                    cards.forEach((card, index) => {
+                                                        card.querySelector('.position-number').textContent = index + 1;
+                                                    });
+                                                }
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="card shadow-sm">
+                                        <div class="card-body p-4">
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                                <a t-attf-href="/my/recruitment/#{recruitment_request.id}" class="btn btn-secondary">
+                                                    <i class="fa fa-times me-1"/>
+                                                    Cancel
+                                                </a>
+                                                <div class="d-flex gap-2">
+                                                    <button type="submit" name="button_save" class="btn btn-success">
+                                                        <i class="fa fa-save me-1"/>
+                                                        Save Changes
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- DEPRECATED OLD EDIT FORM - Keep for reference, will be replaced -->
+    <template id="portal_edit_recruitment_request_old_deprecated" name="Edit Recruitment Request (Old)">
+        <t t-if="False">  <!-- Disabled -->
+            <t t-if="request.env.user.partner_id.user_type == 'employer'">
+                <t t-set="allowed_states" t-value="['draft', 'submitted', 'under_review', 'quotation_sent']"/>
+                <t t-if="recruitment_request.state in allowed_states">
+                    <t t-call="portal.portal_layout">
+
+                    <style>
+                        .edit-section-card {
+                            border-left: 4px solid #28a745;
+                            margin-bottom: 2rem;
+                            transition: all 0.3s ease;
+                        }
+                        .edit-section-card:hover {
+                            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+                        }
+                        .edit-section-header {
+                            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+                            color: white;
+                            padding: 1.5rem;
+                            border-radius: 10px;
+                            margin-bottom: 2rem;
+                        }
+                        .edit-form-label {
+                            font-weight: 600;
+                            color: #495057;
+                            margin-bottom: 0.5rem;
+                        }
+                        .edit-form-control:focus, .edit-form-select:focus {
+                            border-color: #28a745;
+                            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+                        }
+                        .edit-input-group-text {
+                            background-color: #f8f9fa;
+                            border-right: none;
+                        }
+                        .edit-input-group .form-control {
+                            border-left: none;
+                        }
+                        .edit-required-field::after {
+                            content: " *";
+                            color: #dc3545;
+                        }
+                        .edit-info-text {
+                            font-size: 0.875rem;
+                            color: #6c757d;
+                            font-style: italic;
+                        }
+                        .current-value-badge {
+                            background-color: #e7f3ff;
+                            color: #0066cc;
+                            padding: 0.25rem 0.75rem;
+                            border-radius: 15px;
+                            font-size: 0.85rem;
+                            margin-left: 0.5rem;
+                        }
+                    </style>
+
+                    <div class="container mt-4 mb-5">
+                        <div class="row">
+                            <div class="col-lg-10 offset-lg-1">
+                                <!-- Header -->
+                                <div class="edit-section-header text-center">
+                                    <i class="fa fa-edit fa-3x mb-3"/>
+                                    <h2 class="mb-2">Edit Recruitment Request</h2>
+                                    <p class="mb-2">
+                                        <span class="current-value-badge">
+                                            <i class="fa fa-file-text-o me-1"/>
+                                            <t t-out="recruitment_request.name"/>
+                                        </span>
+                                    </p>
+                                    <p class="mb-0">Update your recruitment request details</p>
+                                </div>
+
+                                <form action="/my/recruitment/update" method="POST" class="needs-validation" novalidate="novalidate">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    <input type="hidden" name="request_id" t-att-value="recruitment_request.id"/>
+
+                                    <!-- Job Information Section -->
+                                    <div class="card edit-section-card shadow-sm">
+                                        <div class="card-body p-4">
+                                            <h4 class="mb-4">
+                                                <i class="fa fa-info-circle text-success me-2"/>
+                                                Job Information
+                                            </h4>
+
+                                            <div class="mb-4">
+                                                <label for="job_title" class="edit-form-label edit-required-field">Job Title</label>
+                                                <div class="input-group">
+                                                    <span class="edit-input-group-text"><i class="fa fa-tag"/></span>
+                                                    <input type="text" class="form-control edit-form-control" name="job_title" required="required"
+                                                           t-att-value="recruitment_request.job_title"
+                                                           placeholder="e.g., Senior Software Engineer"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6 mb-4">
+                                                    <label for="department_id" class="edit-form-label">Department</label>
+                                                    <div class="input-group">
+                                                        <span class="edit-input-group-text"><i class="fa fa-sitemap"/></span>
+                                                        <select class="form-select edit-form-select" name="department_id" style="border-left: 1px solid #ced4da;">
+                                                            <option value="">Select department...</option>
+                                                            <t t-foreach="departments" t-as="dept">
+                                                                <option t-att-value="dept.id" t-att-selected="'selected' if recruitment_request.department_id and dept.id == recruitment_request.department_id.id else None">
+                                                                    <t t-esc="dept.name"/>
+                                                                </option>
+                                                            </t>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-4">
+                                                    <label for="no_of_positions" class="edit-form-label edit-required-field">Number of Positions</label>
+                                                    <div class="input-group">
+                                                        <span class="edit-input-group-text"><i class="fa fa-users"/></span>
+                                                        <input type="number" class="form-control edit-form-control" name="no_of_positions"
+                                                               t-att-value="recruitment_request.no_of_positions"
+                                                               value="1" min="1" required="required"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-12 mb-4">
+                                                    <label for="emp_contract_type" class="edit-form-label edit-required-field">Contract Type</label>
+                                                    <div class="input-group">
+                                                        <span class="edit-input-group-text"><i class="fa fa-file-text"/></span>
+                                                        <select class="form-select edit-form-select" name="emp_contract_type" required="required" style="border-left: 1px solid #ced4da;">
+                                                            <option value="">Select contract type...</option>
+                                                            <t t-foreach="emp_contract_type" t-as="ct">
+                                                                <option t-att-value="ct.id" t-att-selected="'selected' if ct.id == recruitment_request.emp_contract_type.id else None">
+                                                                    <t t-esc="ct.name"/>
+                                                                </option>
+                                                            </t>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label for="work_location" class="edit-form-label edit-required-field">Work Location</label>
+                                                <div class="input-group">
+                                                    <span class="edit-input-group-text"><i class="fa fa-map-marker"/></span>
+                                                    <input type="text" class="form-control edit-form-control" name="work_location" required="required"
+                                                           t-att-value="recruitment_request.work_location"
+                                                           placeholder="e.g., DUBAI, UAE"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <div class="form-check form-switch">
+                                                    <input type="checkbox" class="form-check-input" name="remote_work" id="remote_work" value="1"
+                                                           t-att-checked="'checked' if recruitment_request.remote_work else None"
+                                                           style="cursor: pointer;"/>
+                                                    <label class="form-check-label" for="remote_work" style="cursor: pointer;">
+                                                        <i class="fa fa-home text-success me-1"/>
+                                                        Remote Work Available
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label for="job_description" class="edit-form-label edit-required-field">Job Description</label>
+                                                <textarea class="form-control edit-form-control" name="job_description" rows="5"
+                                                          required="required"
+                                                          placeholder="Provide a detailed description of the role, key responsibilities, and what makes this opportunity exciting..."><t t-out="recruitment_request.job_description"/></textarea>
+                                                <small class="edit-info-text">Be specific about daily tasks and team dynamics</small>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label for="requirements" class="edit-form-label">Requirements &amp; Qualifications</label>
+                                                <textarea class="form-control edit-form-control" name="requirements" rows="4"
+                                                          placeholder="List the essential qualifications, certifications, and experience needed..."><t t-out="recruitment_request.requirements"/></textarea>
+                                                <small class="edit-info-text">Include both must-have and nice-to-have qualifications</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Experience & Education Section -->
+                                    <div class="card edit-section-card shadow-sm">
+                                        <div class="card-body p-4">
+                                            <h4 class="mb-4">
+                                                <i class="fa fa-graduation-cap text-success me-2"/>
+                                                Experience &amp; Education
+                                            </h4>
+
+                                            <div class="row">
+                                                <div class="col-md-6 mb-4">
+                                                    <label for="expected_degree" class="edit-form-label">Minimum Education Level</label>
+                                                    <div class="input-group">
+                                                        <span class="edit-input-group-text"><i class="fa fa-certificate"/></span>
+                                                        <select class="form-select edit-form-select" name="expected_degree" style="border-left: 1px solid #ced4da;">
+                                                            <option value="">Not Specified</option>
+                                                            <t t-foreach="degrees" t-as="deg">
+                                                                <option t-att-value="deg.id" t-att-selected="'selected' if recruitment_request.expected_degree and deg.id == recruitment_request.expected_degree.id else None">
+                                                                    <t t-esc="deg.name"/>
+                                                                </option>
+                                                            </t>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-4">
+                                                    <label for="experience_years" class="edit-form-label">Required Experience (Years)</label>
+                                                    <div class="input-group">
+                                                        <span class="edit-input-group-text"><i class="fa fa-clock-o"/></span>
+                                                        <input type="number" class="form-control edit-form-control" name="experience_years"
+                                                               t-att-value="recruitment_request.experience_years" min="0"/>
+                                                        <span class="input-group-text">years</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Skills Selection -->
+                                            <div class="mb-4">
+                                                <label class="edit-form-label">Required Skills</label>
+                                                <div class="card">
+                                                    <div class="card-body">
+                                                        <div class="row g-3 mb-3">
+                                                            <div class="col-md-4">
+                                                                <label for="edit_skill_type_id" class="form-label">Skill Category</label>
+                                                                <select class="form-select" id="edit_skill_type_id">
+                                                                    <option value="">Select Category...</option>
+                                                                    <t t-foreach="skill_types" t-as="st">
+                                                                        <option t-att-value="st.id" t-esc="st.name"/>
+                                                                    </t>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-5">
+                                                                <label for="edit_skill_id" class="form-label">Skill</label>
+                                                                <select class="form-select" id="edit_skill_id" disabled="disabled">
+                                                                    <option value="">Select Skill...</option>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-3 d-flex align-items-end">
+                                                                <button type="button" class="btn btn-primary w-100" id="edit_add_skill_btn" disabled="disabled">
+                                                                    <i class="fa fa-plus me-1"/>Add
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div id="edit_selected_skills_container">
+                                                            <label class="form-label">Selected Skills:</label>
+                                                            <div id="edit_skills_badges" class="d-flex flex-wrap gap-2">
+                                                                <t t-foreach="recruitment_request.job_skill_ids" t-as="skill">
+                                                                    <span class="badge bg-primary" t-att-id="'edit_skill_badge_' + str(skill.id)">
+                                                                        <t t-esc="skill.name"/>
+                                                                        <i class="fa fa-times ms-1" style="cursor:pointer" t-att-onclick="'removeEditSkill(' + str(skill.id) + ')'"/>
+                                                                    </span>
+                                                                </t>
+                                                            </div>
+                                                            <input type="hidden" name="job_skill_ids" id="edit_job_skill_ids_input" t-att-value="','.join(map(str, recruitment_request.job_skill_ids.ids))"/>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <small class="edit-info-text">Select category first, then choose skills to add</small>
+                                            </div>
+
+                                            <script>
+                                                document.addEventListener('DOMContentLoaded', function() {
+                                                    const skillTypeSelect = document.getElementById('edit_skill_type_id');
+                                                    const skillSelect = document.getElementById('edit_skill_id');
+                                                    const addBtn = document.getElementById('edit_add_skill_btn');
+                                                    const badgesContainer = document.getElementById('edit_skills_badges');
+                                                    const hiddenInput = document.getElementById('edit_job_skill_ids_input');
+                                                    let selectedSkills = hiddenInput.value ? hiddenInput.value.split(',').map(Number) : [];
+
+                                                    skillTypeSelect.addEventListener('change', async function() {
+                                                        if (this.value) {
+                                                            skillSelect.disabled = false;
+                                                            // Fetch skills by type using JSON-RPC
+                                                            try {
+                                                                const response = await fetch('/my/recruitment/get_skills', {
+                                                                    method: 'POST',
+                                                                    headers: {
+                                                                        'Content-Type': 'application/json',
+                                                                    },
+                                                                    body: JSON.stringify({
+                                                                        jsonrpc: '2.0',
+                                                                        method: 'call',
+                                                                        params: {
+                                                                            skill_type_id: this.value
+                                                                        },
+                                                                        id: Math.floor(Math.random() * 1000000)
+                                                                    })
+                                                                });
+                                                                const data = await response.json();
+                                                                const skills = data.result || [];
+                                                                skillSelect.innerHTML = '<option value="">Select Skill...</option>';
+                                                                skills.forEach(skill => {
+                                                                    const option = document.createElement('option');
+                                                                    option.value = skill.id;
+                                                                    option.textContent = skill.name;
+                                                                    skillSelect.appendChild(option);
+                                                                });
+                                                            } catch (error) {
+                                                                console.error('Error fetching skills:', error);
+                                                            }
+                                                        } else {
+                                                            skillSelect.disabled = true;
+                                                            skillSelect.innerHTML = '<option value="">Select Skill...</option>';
+                                                        }
+                                                    });
+
+                                                    skillSelect.addEventListener('change', function() {
+                                                        addBtn.disabled = !this.value;
+                                                    });
+
+                                                    addBtn.addEventListener('click', function() {
+                                                        const skillId = parseInt(skillSelect.value);
+                                                        const skillName = skillSelect.options[skillSelect.selectedIndex].text;
+
+                                                        if (!selectedSkills.includes(skillId)) {
+                                                            selectedSkills.push(skillId);
+
+                                                            const badge = document.createElement('span');
+                                                            badge.className = 'badge bg-primary';
+                                                            badge.innerHTML = `${skillName} <i class="fa fa-times ms-1" style="cursor:pointer" onclick="removeEditSkill(${skillId})"></i>`;
+                                                            badge.id = `edit_skill_badge_${skillId}`;
+                                                            badgesContainer.appendChild(badge);
+
+                                                            hiddenInput.value = selectedSkills.join(',');
+                                                        }
+
+                                                        skillTypeSelect.value = '';
+                                                        skillSelect.innerHTML = '<option value="">Select Skill...</option>';
+                                                        skillSelect.disabled = true;
+                                                        addBtn.disabled = true;
+                                                    });
+
+                                                    window.removeEditSkill = function(skillId) {
+                                                        selectedSkills = selectedSkills.filter(id => id !== skillId);
+                                                        document.getElementById(`edit_skill_badge_${skillId}`).remove();
+                                                        hiddenInput.value = selectedSkills.join(',');
+                                                    };
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
+
+                                    <!-- Compensation Section -->
+                                    <div class="card edit-section-card shadow-sm">
+                                        <div class="card-body p-4">
+                                            <h4 class="mb-4">
+                                                <i class="fa fa-money text-success me-2"/>
+                                                Compensation &amp; Benefits
+                                            </h4>
+
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="salary_from" class="edit-form-label">Minimum Salary</label>
+                                                    <div class="input-group">
+                                                        <span class="edit-input-group-text"><i class="fa fa-dollar"/></span>
+                                                        <input type="number" class="form-control edit-form-control" name="salary_from"
+                                                               t-att-value="recruitment_request.salary_from if recruitment_request.salary_from else ''"
+                                                               placeholder="e.g., 50000"/>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label for="salary_to" class="edit-form-label">Maximum Salary</label>
+                                                    <div class="input-group">
+                                                        <span class="edit-input-group-text"><i class="fa fa-dollar"/></span>
+                                                        <input type="number" class="form-control edit-form-control" name="salary_to"
+                                                               t-att-value="recruitment_request.salary_to if recruitment_request.salary_to else ''"
+                                                               placeholder="e.g., 80000"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label for="benefits" class="edit-form-label">Benefits &amp; Perks</label>
+                                                <textarea class="form-control edit-form-control" name="benefits" rows="4"
+                                                          placeholder="e.g., Health insurance, Dental coverage, 401(k) matching, Flexible hours, Professional development budget, Gym membership..."><t t-out="recruitment_request.benefits"/></textarea>
+                                                <small class="edit-info-text">Include health benefits, time off, bonuses, and other perks</small>
+                                            </div>
+
+                                            <div class="mb-4">
+                                                <label for="expected_start_date" class="edit-form-label">Expected Start Date</label>
+                                                <div class="input-group">
+                                                    <span class="edit-input-group-text"><i class="fa fa-calendar"/></span>
+                                                    <input type="date" class="form-control edit-form-control" name="expected_start_date"
+                                                           t-att-value="recruitment_request.expected_start_date"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="card shadow-sm">
+                                        <div class="card-body py-3 px-3">
+                                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                                <small class="text-muted">
+                                                    <i class="fa fa-info-circle me-1"/>
+                                                    Fields marked with <span class="text-danger">*</span> are required
+                                                </small>
+                                                <button type="submit" name="button_submit" class="btn btn-success">
+                                                    <i class="fa fa-paper-plane me-1"/>Save &amp; Submit
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    </t>  <!-- Close t-call portal.portal_layout -->
+                </t>  <!-- Close t-if recruitment_request.state in allowed_states -->
+            </t>  <!-- Close t-if user_type == employer -->
+        </t>  <!-- Close t-if False (disabled) -->
+    </template>
+
+    <!-- Portal Applicants View -->
+    <template id="portal_my_recruitment_applicants" name="Portal Recruitment Applicants">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Applicants</t>
+            </t>
+
+            <style>
+                .applicant-card {
+                    border: 1px solid #e2e8f0;
+                    border-radius: 12px;
+                    transition: all 0.3s ease;
+                    background: white;
+                    cursor: pointer;
+                    height: 100%;
+                }
+                .applicant-card:hover {
+                    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+                    transform: translateY(-4px);
+                    border-color: #667eea;
+                }
+                .applicant-avatar {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-weight: 700;
+                    font-size: 1.25rem;
+                    flex-shrink: 0;
+                }
+                .stage-badge {
+                    font-size: 0.7rem;
+                    padding: 0.3rem 0.6rem;
+                    border-radius: 20px;
+                    font-weight: 600;
+                    text-transform: uppercase;
+                    letter-spacing: 0.3px;
+                }
+                .applicant-info-compact {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.4rem;
+                    font-size: 0.85rem;
+                    color: #4a5568;
+                }
+                .applicant-info-compact i {
+                    width: 16px;
+                    text-align: center;
+                }
+                .sidebar-card {
+                    background: white;
+                    border-radius: 16px;
+                    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+                    margin-bottom: 1rem;
+                    padding: 1.25rem;
+                }
+                .stat-item {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 0.75rem;
+                    background: linear-gradient(145deg, #f7fafc 0%, #edf2f7 100%);
+                    border-radius: 10px;
+                    margin-bottom: 0.5rem;
+                }
+                .urgency-compact {
+                    padding: 0.5rem 0.75rem;
+                    border-radius: 8px;
+                    font-size: 0.75rem;
+                    margin-top: 0.5rem;
+                }
+                details summary {
+                    list-style: none;
+                    user-select: none;
+                }
+                details summary::-webkit-details-marker {
+                    display: none;
+                }
+                details[open] summary i.fa-chevron-right {
+                    transform: rotate(90deg);
+                }
+                details summary i.fa-chevron-right {
+                    transition: transform 0.3s ease;
+                }
+            </style>
+
+            <!-- Two Column Layout -->
+            <div class="row mt-4">
+                <!-- Sidebar (Left - 4 columns) -->
+                <div class="col-lg-4 mb-4">
+                    <div class="sticky-top" style="top: 20px;">
+                        <!-- Header Card -->
+                        <div class="sidebar-card">
+                            <h5 class="fw-bold mb-2">
+                                <i class="fa fa-users me-2 text-primary"/>
+                                <t t-out="recruitment_request.name"/>
+                            </h5>
+                            <small class="text-muted d-block mb-3">
+                                <i class="fa fa-building me-1"/><t t-out="recruitment_request.partner_id.name"/>
+                            </small>
+                            <a t-attf-href="/my/recruitment/#{recruitment_request.id}" class="btn btn-sm btn-outline-secondary w-100">
+                                <i class="fa fa-arrow-left me-1"/>
+                                Back to Request
+                            </a>
+                        </div>
+
+                        <!-- Stats Card -->
+                        <div class="sidebar-card">
+                            <h6 class="fw-bold mb-3">
+                                <i class="fa fa-chart-bar me-2 text-success"/>
+                                Statistics
+                            </h6>
+                            <div class="stat-item">
+                                <span><i class="fa fa-users me-1 text-primary"/>Total</span>
+                                <span class="badge bg-primary"><t t-out="applicant_count"/></span>
+                            </div>
+                            <div class="stat-item">
+                                <span><i class="fa fa-briefcase me-1 text-info"/>Positions</span>
+                                <span class="badge bg-info"><t t-out="len(recruitment_request.line_ids.mapped('job_id'))"/></span>
+                            </div>
+                            <div class="stat-item">
+                                <span><i class="fa fa-check-circle me-1 text-success"/>Hired</span>
+                                <span class="badge bg-success"><t t-out="len(applicants.filtered(lambda a: a.stage_id.hired_stage))"/></span>
+                            </div>
+                            <div class="stat-item">
+                                <span><i class="fa fa-clock-o me-1 text-warning"/>In Progress</span>
+                                <span class="badge bg-warning"><t t-out="len(applicants.filtered(lambda a: not a.stage_id.fold and not a.stage_id.hired_stage))"/></span>
+                            </div>
+                        </div>
+
+                        <!-- Urgency Alerts -->
+                        <t t-set="urgent_applicants" t-value="applicants.filtered(lambda a: a.urgency_status in ['urgent', 'overdue'])"/>
+                        <t t-set="attention_applicants" t-value="applicants.filtered(lambda a: a.urgency_status == 'attention')"/>
+
+                        <t t-if="urgent_applicants or attention_applicants">
+                            <div class="sidebar-card">
+                                <h6 class="fw-bold mb-3">
+                                    <i class="fa fa-exclamation-triangle me-2 text-danger"/>
+                                    Alerts
+                                </h6>
+                                <t t-if="urgent_applicants">
+                                    <div class="alert alert-danger p-2 mb-2" role="alert">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-fire me-2"/>
+                                            <div>
+                                                <strong class="d-block" style="font-size: 0.85rem;">Urgent!</strong>
+                                                <small style="font-size: 0.75rem;"><t t-out="len(urgent_applicants)"/> need decision now</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                                <t t-if="attention_applicants">
+                                    <div class="alert alert-warning p-2 mb-0" role="alert">
+                                        <div class="d-flex align-items-center">
+                                            <i class="fa fa-clock-o me-2"/>
+                                            <div>
+                                                <strong class="d-block" style="font-size: 0.85rem;">Attention</strong>
+                                                <small style="font-size: 0.75rem;"><t t-out="len(attention_applicants)"/> need review</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+                    </div>
+                </div>
+                <!-- End Sidebar -->
+
+                <!-- Main Content (Right - 8 columns) -->
+                <div class="col-lg-8">
+                    <t t-if="applicant_count == 0">
+                        <div class="alert alert-info text-center p-5" role="alert">
+                            <i class="fa fa-info-circle fa-3x mb-3 d-block text-info"/>
+                            <h5>No Applicants Yet</h5>
+                            <p class="mb-0">No applicants have applied for this recruitment request yet.</p>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <div class="row">
+                            <t t-foreach="applicants" t-as="applicant">
+                                <div class="col-lg-6 mb-3">
+                                    <div class="card applicant-card p-3">
+                                        <!-- Header with Avatar and Name -->
+                                        <div class="d-flex align-items-center mb-3">
+                                            <div class="applicant-avatar me-3">
+                                                <t t-out="applicant.partner_name[:2].upper()"/>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1 fw-bold">
+                                                    <t t-out="applicant.partner_name"/>
+                                                </h6>
+                                                <small class="text-muted">
+                                                    <i class="fa fa-briefcase me-1"/><t t-out="applicant.job_id.name"/>
+                                                </small>
+                                            </div>
+                                            <span t-attf-class="stage-badge bg-{{applicant.stage_id.legend_normal or 'secondary'}} text-white">
+                                                <t t-out="applicant.stage_id.name"/>
+                                            </span>
+                                        </div>
+
+                                        <!-- Compact Info Grid -->
+                                        <div class="row g-2 mb-2">
+                                            <div class="col-6">
+                                                <div class="applicant-info-compact">
+                                                    <i class="fa fa-calendar text-muted"/>
+                                                    <small><t t-out="applicant.create_date" t-options='{"widget": "date"}'/></small>
+                                                </div>
+                                            </div>
+                                            <div class="col-6" t-if="applicant.priority">
+                                                <div class="applicant-info-compact">
+                                                    <i class="fa fa-star text-warning"/>
+                                                    <small>
+                                                        <t t-if="applicant.priority == '0'">Normal</t>
+                                                        <t t-elif="applicant.priority == '1'">Good</t>
+                                                        <t t-elif="applicant.priority == '2'">Very Good</t>
+                                                        <t t-elif="applicant.priority == '3'">Excellent</t>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            <div class="col-12" t-if="applicant.salary_expected">
+                                                <div class="applicant-info-compact">
+                                                    <i class="fa fa-money text-success"/>
+                                                    <small>Expected: <t t-out="applicant.salary_expected"/></small>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Urgency Badge - Compact -->
+                                        <t t-if="applicant.time_to_fill_date and not applicant.stage_id.hired_stage">
+                                            <div class="urgency-compact text-white" t-attf-style="background-color: {{applicant.urgency_color}};">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <t t-if="applicant.urgency_status == 'overdue'">
+                                                            <strong>Overdue!</strong>
+                                                            <small class="d-block">Decide now</small>
+                                                        </t>
+                                                        <t t-elif="applicant.urgency_status == 'urgent'">
+                                                            <strong>Urgent</strong>
+                                                            <small class="d-block">Deadline soon</small>
+                                                        </t>
+                                                        <t t-elif="applicant.urgency_status == 'attention'">
+                                                            <strong>Ready</strong>
+                                                            <small class="d-block">Review soon</small>
+                                                        </t>
+                                                        <t t-else="">
+                                                            <strong>Available</strong>
+                                                            <small class="d-block">Ready to review</small>
+                                                        </t>
+                                                    </div>
+                                                    <div class="text-end">
+                                                        <div style="font-size: 1.1rem; font-weight: bold;">
+                                                            <t t-out="applicant.days_remaining"/>
+                                                        </div>
+                                                        <small style="font-size: 0.65rem;">days left</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </t>
+
+                                        <!-- Expandable Details Section -->
+                                        <details class="mt-3">
+                                            <summary class="cursor-pointer text-primary fw-bold" style="cursor: pointer; font-size: 0.85rem;">
+                                                <i class="fa fa-chevron-right me-1"/>View More Details
+                                            </summary>
+                                            <div class="mt-2 p-3 bg-light rounded">
+                                                <!-- Candidate Information Grid -->
+                                                <div class="row g-3 mb-3">
+                                                    <!-- Application Status/Stage -->
+                                                    <div class="col-12">
+                                                        <strong class="d-block mb-2" style="font-size: 0.85rem;">
+                                                            <i class="fa fa-flag me-1 text-primary"/>Application Status
+                                                        </strong>
+                                                        <div class="ps-3">
+                                                            <span t-attf-class="badge bg-{{applicant.stage_id.legend_normal or 'secondary'}} text-white" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                                                <i class="fa fa-circle me-1" style="font-size: 0.6rem;"/>
+                                                                <t t-out="applicant.stage_id.name"/>
+                                                            </span>
+                                                            <t t-if="applicant.stage_id.hired_stage">
+                                                                <span class="badge bg-success ms-2" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                                                                    <i class="fa fa-check-circle me-1"/>Hired
+                                                                </span>
+                                                            </t>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Salary & Availability -->
+                                                    <div class="col-md-6" t-if="applicant.contract_salary or applicant.salary_expected">
+                                                        <strong class="d-block mb-2" style="font-size: 0.85rem;">
+                                                            <i class="fa fa-money me-1 text-success"/>Salary Information
+                                                        </strong>
+                                                        <div class="ps-3">
+                                                            <div class="mb-1" t-if="applicant.contract_salary">
+                                                                <small class="text-muted d-block">Agreed Salary</small>
+                                                                <strong class="text-success">
+                                                                    <span t-field="applicant.contract_salary" t-options='{"widget": "monetary", "display_currency": applicant.company_currency_id}'/>
+                                                                </strong>
+                                                            </div>
+                                                            <div t-if="applicant.salary_expected and not applicant.contract_salary">
+                                                                <small class="text-muted d-block">Expected Salary</small>
+                                                                <strong>
+                                                                    <t t-out="applicant.salary_expected"/>
+                                                                </strong>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6" t-if="applicant.availability">
+                                                        <strong class="d-block mb-2" style="font-size: 0.85rem;">
+                                                            <i class="fa fa-calendar-check-o me-1 text-info"/>Availability
+                                                        </strong>
+                                                        <div class="ps-3">
+                                                            <small class="text-muted d-block">Can Join From</small>
+                                                            <strong>
+                                                                <span t-field="applicant.availability" t-options='{"widget": "date"}'/>
+                                                            </strong>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Guarantee Period -->
+                                                    <div class="col-md-6" t-if="applicant.guarantee_period_end and applicant.stage_id.hired_stage">
+                                                        <strong class="d-block mb-2" style="font-size: 0.85rem;">
+                                                            <i class="fa fa-shield me-1 text-warning"/>Guarantee Period
+                                                        </strong>
+                                                        <div class="ps-3">
+                                                            <small class="text-muted d-block">Valid Until</small>
+                                                            <strong>
+                                                                <span t-field="applicant.guarantee_period_end" t-options='{"widget": "date"}'/>
+                                                            </strong>
+                                                            <t t-if="applicant.is_under_guarantee">
+                                                                <div class="badge bg-success mt-1">
+                                                                    <i class="fa fa-check-circle me-1"/>
+                                                                    <t t-out="applicant.guarantee_days_remaining"/> days remaining
+                                                                </div>
+                                                            </t>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Education -->
+                                                    <div class="col-md-6" t-if="applicant.type_id">
+                                                        <strong class="d-block mb-2" style="font-size: 0.85rem;">
+                                                            <i class="fa fa-graduation-cap me-1 text-info"/>Education
+                                                        </strong>
+                                                        <div class="ps-3">
+                                                            <strong><t t-out="applicant.type_id.name"/></strong>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Documents Section -->
+                                                <div class="mb-3 pb-3 border-bottom" t-if="applicant.resume_attachment or applicant.interview_result_attachment">
+                                                    <strong class="d-block mb-2" style="font-size: 0.85rem;">
+                                                        <i class="fa fa-files-o me-1 text-primary"/>Documents
+                                                    </strong>
+                                                    <div class="d-flex flex-wrap gap-2">
+                                                        <!-- Resume/CV Download -->
+                                                        <t t-if="applicant.resume_attachment">
+                                                            <a t-attf-href="/my/recruitment/applicant/#{applicant.id}/download_resume"
+                                                               class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1">
+                                                                <i class="fa fa-file-pdf-o"/>
+                                                                Resume/CV
+                                                            </a>
+                                                        </t>
+
+                                                        <!-- Interview Result Download -->
+                                                        <t t-if="applicant.interview_result_attachment">
+                                                            <a t-attf-href="/my/recruitment/applicant/#{applicant.id}/download_interview_result"
+                                                               class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1">
+                                                                <i class="fa fa-file-text"/>
+                                                                Interview Result
+                                                            </a>
+                                                        </t>
+                                                    </div>
+                                                </div>
+
+                                                    <!-- Interview Meeting URL -->
+                                                    <t t-if="applicant.interview_meeting_url">
+                                                        <div class="mb-3">
+                                                            <strong class="d-block mb-2" style="font-size: 0.85rem;">
+                                                                <i class="fa fa-video-camera me-1 text-primary"/>Interview Meeting
+                                                            </strong>
+                                                            <a t-att-href="applicant.interview_meeting_url"
+                                                               class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1"
+                                                               target="_blank">
+                                                                <i class="fa fa-external-link"/>
+                                                                Join Meeting
+                                                            </a>
+                                                            <t t-if="applicant.interview_date">
+                                                                <div class="mt-1">
+                                                                    <small class="text-muted">
+                                                                        <i class="fa fa-calendar me-1"/>
+                                                                        <span t-field="applicant.interview_date" t-options='{"widget": "datetime"}'/>
+                                                                    </small>
+                                                                </div>
+                                                            </t>
+                                                        </div>
+                                                    </t>
+
+                                                    <!-- Google Drive Recording URLs -->
+                                                    <t t-if="applicant.google_drive_recording_urls">
+                                                        <div class="mb-3">
+                                                            <strong class="d-block mb-2" style="font-size: 0.85rem;">
+                                                                <i class="fa fa-play-circle me-1 text-danger"/>Interview Recordings
+                                                            </strong>
+                                                            <t t-set="recording_urls" t-value="applicant.google_drive_recording_urls.strip().split('\n')"/>
+                                                            <div class="d-flex flex-column gap-1">
+                                                                <t t-foreach="recording_urls" t-as="url">
+                                                                    <t t-if="url.strip()">
+                                                                        <a t-att-href="url.strip()"
+                                                                           class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1"
+                                                                           target="_blank"
+                                                                           style="width: fit-content;">
+                                                                            <i class="fa fa-play"/>
+                                                                            Recording <t t-out="url_index + 1"/>
+                                                                        </a>
+                                                                    </t>
+                                                                </t>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+
+                                                    <!-- Google Drive Folder -->
+                                                    <t t-if="applicant.google_drive_folder_url">
+                                                        <div class="mb-3">
+                                                            <strong class="d-block mb-2" style="font-size: 0.85rem;">
+                                                                <i class="fa fa-folder-open me-1 text-warning"/>Google Drive Folder
+                                                            </strong>
+                                                            <a t-att-href="applicant.google_drive_folder_url"
+                                                               class="btn btn-sm btn-outline-warning d-inline-flex align-items-center gap-1"
+                                                               target="_blank">
+                                                                <i class="fa fa-folder"/>
+                                                                Open Folder
+                                                            </a>
+                                                        </div>
+                                                    </t>
+
+                                                    <!-- Interview Notes/Results -->
+                                                    <t t-if="applicant.interview_notes">
+                                                        <div>
+                                                            <strong class="d-block mb-2" style="font-size: 0.85rem;">
+                                                                <i class="fa fa-sticky-note me-1 text-info"/>Interview Notes
+                                                            </strong>
+                                                            <div class="p-2 bg-white rounded border" style="font-size: 0.85rem;">
+                                                                <div t-field="applicant.interview_notes"/>
+                                                            </div>
+                                                        </div>
+                                                    </t>
+                                                </div>
+                                            </details>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+                <!-- End Main Content -->
+            </div>
+        </t>
+    </template>
+</odoo>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Convert to Recruitment Wizard Form -->
+    <record id="view_convert_to_recruitment_wizard_form" model="ir.ui.view">
+        <field name="name">convert.to.recruitment.wizard.form</field>
+        <field name="model">convert.to.recruitment.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group string="Company Information">
+                            <field name="lead_id" invisible="1"/>
+                            <field name="partner_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   placeholder="Select employer company..."/>
+                            <field name="contact_person_id"
+                                   options="{'no_create': True, 'no_open': True}"
+                                   placeholder="Select contact person..."/>
+                        </group>
+
+                        <group string="Work Location &amp; Schedule">
+                            <field name="work_location" placeholder="e.g., New York, USA"/>
+                            <field name="remote_work"/>
+                            <field name="expected_start_date"/>
+                        </group>
+                    </group>
+
+
+                    <div class="row">
+                        <h4>Benefits &amp; Perks</h4>
+                        <div class="col-12">
+                            <field name="benefits"
+                                   nolabel="1"
+                                   placeholder="e.g., Health insurance, Dental coverage, 401(k) matching, Flexible hours, Professional development budget..."/>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <h4>Internal Notes</h4>
+                        <div class="col-12">
+                            <field name="notes"
+                                   nolabel="1"
+                                   placeholder="Additional notes from the opportunity or other important details..."/>
+                        </div>
+                    </div>
+
+                    <notebook>
+                        <page string="Job Positions" name="job_positions">
+                            <field name="job_lines">
+                                <list editable="bottom">
+                                    <field name="job_title" required="1"/>
+                                    <field name="no_of_positions"/>
+                                    <field name="department_id" optional="show"/>
+                                    <field name="emp_contract_type" optional="show"/>
+                                    <field name="experience_years" optional="show"/>
+                                    <field name="expected_degree" optional="hide"/>
+                                    <field name="salary_from" optional="hide"/>
+                                    <field name="salary_to" optional="hide"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                </list>
+                                <form>
+                                    <sheet>
+                                        <group>
+                                            <group string="Basic Information">
+                                                <field name="job_title" placeholder="e.g., Senior Software Engineer"/>
+                                                <field name="no_of_positions"/>
+                                                <field name="department_id"/>
+                                                <field name="emp_contract_type"/>
+                                            </group>
+                                            <group string="Requirements">
+                                                <field name="expected_degree"/>
+                                                <field name="experience_years"/>
+                                                <field name="job_skill_ids" widget="many2many_tags"/>
+                                            </group>
+                                        </group>
+
+                                        <group string="Job Description">
+                                            <field name="job_description" nolabel="1"
+                                                   placeholder="Provide a detailed description of the role, key responsibilities, and what makes this opportunity exciting..."/>
+                                        </group>
+
+                                        <group string="Requirements &amp; Qualifications">
+                                            <field name="requirements" nolabel="1"
+                                                   placeholder="List the essential qualifications, certifications, and experience needed..."/>
+                                        </group>
+
+                                        <group>
+                                            <group string="Salary Range">
+                                                <field name="salary_from"/>
+                                                <field name="salary_to"/>
+                                                <field name="currency_id" invisible="1"/>
+                                            </group>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+                <footer>
+                    <button name="action_convert"
+                            string="Convert to Local Recruitment"
+                            type="object"
+                            class="btn-primary"
+                            icon="fa-check"/>
+                    <button string="Cancel"
+                            class="btn-secondary"
+                            special="cancel"
+                            icon="fa-times"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open the wizard -->
+    <record id="action_convert_to_recruitment_wizard" model="ir.actions.act_window">
+        <field name="name">Convert to Local Recruitment</field>
+        <field name="res_model">convert.to.recruitment.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="binding_model_id" ref="crm.model_crm_lead"/>
+        <field name="binding_view_types">form</field>
+    </record>
+
+</odoo>

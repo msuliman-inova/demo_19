@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="view_crm_lead2opportunity_partner_inherit_recruitment" model="ir.ui.view">
+        <field name="name">crm.lead2opportunity.partner.form.inherit.recruitment</field>
+        <field name="model">crm.lead2opportunity.partner</field>
+        <field name="inherit_id" ref="crm.view_crm_lead2opportunity_partner"/>
+        <field name="arch" type="xml">
+            <xpath expr="//footer" position="before">
+                <group string="Email Attachment">
+                    <field name="email_attach" filename="email_attach_filename" required="1"/>
+                    <field name="email_attach_filename" invisible="1"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>

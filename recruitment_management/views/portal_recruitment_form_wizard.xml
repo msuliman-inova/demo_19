@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Multi-Step Wizard Enhancement for Recruitment Request Form -->
+    <template id="recruitment_form_wizard_enhancement" inherit_id="recruitment_management.portal_create_recruitment_request" name="Recruitment Form - Multi-Step Wizard">
+
+        <!-- Add progress stepper at the top of the form -->
+        <xpath expr="//div[hasclass('section-header')]" position="after">
+            <div class="wizard-progress-container mb-4">
+                <div class="wizard-steps">
+                    <div class="wizard-step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-label">General Info</div>
+                    </div>
+                    <div class="wizard-step-connector"></div>
+                    <div class="wizard-step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Job Details</div>
+                    </div>
+                    <div class="wizard-step-connector"></div>
+                    <div class="wizard-step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-label">Review</div>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+
+        <!-- Wrap existing sections in step containers -->
+        <xpath expr="//form[@id='recruitment_form']/div[hasclass('card')][1]" position="attributes">
+            <attribute name="class">card section-card shadow-sm wizard-step-content</attribute>
+            <attribute name="data-wizard-step">1</attribute>
+        </xpath>
+
+        <xpath expr="//form[@id='recruitment_form']/div[hasclass('card')][2]" position="attributes">
+            <attribute name="class">card section-card shadow-sm wizard-step-content</attribute>
+            <attribute name="data-wizard-step">2</attribute>
+            <attribute name="style">display: none;</attribute>
+        </xpath>
+
+        <!-- Add navigation buttons -->
+        <xpath expr="//form[@id='recruitment_form']//button[@name='button_submit']" position="before">
+            <div class="wizard-navigation mb-3">
+                <button type="button" class="btn btn-secondary" id="prevBtn" onclick="changeStep(-1)" style="display: none;">
+                    <i class="fa fa-arrow-left"/> Previous
+                </button>
+                <button type="button" class="btn btn-primary" id="nextBtn" onclick="changeStep(1)">
+                    Next <i class="fa fa-arrow-right"/>
+                </button>
+            </div>
+        </xpath>
+
+        <!-- Modify submit button to be visible only on last step -->
+        <xpath expr="//form[@id='recruitment_form']//button[@name='button_submit']" position="attributes">
+            <attribute name="style">display: none;</attribute>
+            <attribute name="id">submitBtn</attribute>
+        </xpath>
+
+        <!-- Add wizard styles and JavaScript -->
+        <xpath expr="//div[@class='container mt-4 mb-5']" position="before">
+            <style>
+                /* Reset button styles to Bootstrap defaults */
+                .btn-primary,
+                .btn-outline-primary,
+                .btn-secondary,
+                .btn-success,
+                .btn-outline-success {
+                    padding: 0.375rem 0.75rem !important;
+                    border-radius: 0.375rem !important;
+                    font-weight: 400 !important;
+                    font-size: 1rem !important;
+                    line-height: 1.5 !important;
+                    transform: none !important;
+                    box-shadow: none !important;
+                }
+
+                .btn-primary:hover,
+                .btn-outline-primary:hover,
+                .btn-secondary:hover,
+                .btn-success:hover,
+                .btn-outline-success:hover {
+                    transform: none !important;
+                }
+
+                /* Compact Form Inputs - Use default Bootstrap colors */
+                #recruitment_form .form-control,
+                #recruitment_form .form-select {
+                    padding: 0.5rem 0.75rem !important;
+                    font-size: 0.9rem !important;
+                    color: #212529 !important;
+                    background-color: #fff !important;
+                    border: 1px solid #dee2e6 !important;
+                    border-radius: 0.375rem !important;
+                }
+
+                #recruitment_form .form-control:focus,
+                #recruitment_form .form-select:focus {
+                    border-color: #86b7fe !important;
+                    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+                    background-color: #fff !important;
+                }
+
+                #recruitment_form .input-group-text {
+                    padding: 0.5rem 0.75rem !important;
+                    font-size: 0.9rem !important;
+                    background-color: #e9ecef !important;
+                    border: 1px solid #dee2e6 !important;
+                    border-radius: 0.375rem 0 0 0.375rem !important;
+                }
+
+                #recruitment_form .input-group .form-control {
+                    border-radius: 0 0.375rem 0.375rem 0 !important;
+                }
+
+                /* Style date inputs to look nicer */
+                #recruitment_form input[type="date"] {
+                    position: relative;
+                    color: #212529 !important;
+                }
+
+                #recruitment_form input[type="date"]::-webkit-calendar-picker-indicator {
+                    cursor: pointer;
+                    opacity: 0.6;
+                    filter: invert(0.5);
+                }
+
+                #recruitment_form input[type="date"]::-webkit-calendar-picker-indicator:hover {
+                    opacity: 1;
+                }
+
+                #recruitment_form .form-label {
+                    font-size: 0.875rem;
+                    font-weight: 600;
+                    color: #4a5568;
+                    margin-bottom: 0.4rem;
+                }
+
+                #recruitment_form .required-field::after {
+                    content: ' *';
+                    color: #dc3545;
+                }
+
+                #recruitment_form .mb-4 {
+                    margin-bottom: 1rem !important;
+                }
+
+                #recruitment_form textarea.form-control {
+                    resize: vertical;
+                    min-height: 80px;
+                }
+
+                #recruitment_form .info-text {
+                    font-size: 0.8rem;
+                    color: #6c757d;
+                    margin-top: 0.25rem;
+                    display: block;
+                }
+
+                #recruitment_form .card-body {
+                    padding: 1.5rem !important;
+                }
+
+                #recruitment_form h4 {
+                    font-size: 1.1rem;
+                    margin-bottom: 1rem !important;
+                }
+
+                /* Job Position Cards - More Compact */
+                .job-position-card {
+                    background: #f8f9fa;
+                    border-radius: 8px;
+                    padding: 1rem;
+                    margin-bottom: 1rem;
+                    border: 1px solid #e9ecef;
+                }
+
+                .job-position-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 0.75rem;
+                    padding-bottom: 0.5rem;
+                    border-bottom: 2px solid #dee2e6;
+                }
+
+                .job-position-number {
+                    font-weight: 600;
+                    color: #667eea;
+                    font-size: 0.95rem;
+                }
+
+                .remove-job-btn,
+                .add-job-btn {
+                    padding: 0.4rem 0.8rem;
+                    font-size: 0.85rem;
+                    border-radius: 6px;
+                    border: none;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                }
+
+                .add-job-btn {
+                    background: #667eea;
+                    color: white;
+                }
+
+                .add-job-btn:hover {
+                    background: #5568d3;
+                    transform: translateY(-1px);
+                }
+
+                .remove-job-btn {
+                    background: #f8f9fa;
+                    color: #dc3545;
+                    border: 1px solid #dc3545;
+                }
+
+                .remove-job-btn:hover {
+                    background: #dc3545;
+                    color: white;
+                }
+
+                /* Section Cards */
+                .section-card {
+                    border-radius: 10px;
+                    margin-bottom: 1.5rem;
+                    border: 1px solid #e9ecef;
+                }
+
+                /* Wizard Progress Styles */
+                .wizard-progress-container {
+                    background: white;
+                    padding: 1.5rem;
+                    border-radius: 10px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+                }
+
+                .wizard-steps {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    max-width: 600px;
+                    margin: 0 auto;
+                }
+
+                .wizard-step {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    position: relative;
+                    flex: 1;
+                }
+
+                .wizard-step-connector {
+                    flex: 1;
+                    height: 2px;
+                    background: #e0e0e0;
+                    margin: 0 10px;
+                    position: relative;
+                    top: -25px;
+                }
+
+                .wizard-step.active .wizard-step-connector {
+                    background: #667eea;
+                }
+
+                .step-number {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    background: #e0e0e0;
+                    color: #999;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-weight: bold;
+                    font-size: 1.2rem;
+                    margin-bottom: 0.5rem;
+                    transition: all 0.3s;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                .wizard-step.active .step-number {
+                    background: #667eea;
+                    color: white;
+                    transform: scale(1.1);
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                }
+
+                .wizard-step.completed .step-number {
+                    background: #10b981;
+                    color: white;
+                }
+
+                .wizard-step.completed .step-number::after {
+                    content: '\f00c';
+                    font-family: 'FontAwesome';
+                    position: absolute;
+                }
+
+                .step-label {
+                    font-size: 0.9rem;
+                    color: #999;
+                    font-weight: 500;
+                    text-align: center;
+                }
+
+                .wizard-step.active .step-label {
+                    color: #667eea;
+                    font-weight: 600;
+                }
+
+                .wizard-step.completed .step-label {
+                    color: #10b981;
+                }
+
+                /* Navigation buttons */
+                .wizard-navigation {
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 1rem;
+                    margin-top: 2rem;
+                }
+
+                .wizard-navigation button {
+                    min-width: 120px;
+                }
+
+                /* Step content animation */
+                .wizard-step-content {
+                    animation: fadeIn 0.3s ease-in-out;
+                }
+
+                @keyframes fadeIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+
+                /* Mobile responsive */
+                @media (max-width: 768px) {
+                    .step-label {
+                        font-size: 0.75rem;
+                    }
+
+                    .step-number {
+                        width: 40px;
+                        height: 40px;
+                        font-size: 1rem;
+                    }
+
+                    .wizard-step-connector {
+                        top: -20px;
+                    }
+                }
+            </style>
+        </xpath>
+
+        <xpath expr="//form[@id='recruitment_form']" position="after">
+            <script type="text/javascript">
+                <![CDATA[
+                let currentStep = 1;
+                const totalSteps = 3;
+
+                function changeStep(direction) {
+                    // Validate current step before moving forward
+                    if (direction === 1) {
+                        const currentStepContent = document.querySelector(`[data-wizard-step="${currentStep}"]`);
+                        const requiredFields = currentStepContent.querySelectorAll('[required]');
+                        let isValid = true;
+
+                        requiredFields.forEach(field => {
+                            if (!field.value) {
+                                isValid = false;
+                                field.classList.add('is-invalid');
+                            } else {
+                                field.classList.remove('is-invalid');
+                            }
+                        });
+
+                        if (!isValid) {
+                            alert('Please fill in all required fields before proceeding.');
+                            return;
+                        }
+                    }
+
+                    // Hide current step
+                    document.querySelectorAll('.wizard-step-content').forEach(step => {
+                        step.style.display = 'none';
+                    });
+
+                    // Update current step
+                    currentStep += direction;
+
+                    // Show new step
+                    const nextStepContent = document.querySelector(`.wizard-step-content[data-wizard-step="${currentStep}"]`);
+                    if (nextStepContent) {
+                        nextStepContent.style.display = 'block';
+                    }
+
+                    // Update progress indicator
+                    document.querySelectorAll('.wizard-step').forEach((step, index) => {
+                        const stepNum = index + 1;
+                        step.classList.remove('active', 'completed');
+
+                        if (stepNum === currentStep) {
+                            step.classList.add('active');
+                        } else if (stepNum < currentStep) {
+                            step.classList.add('completed');
+                        }
+                    });
+
+                    // Update navigation buttons
+                    const prevBtn = document.getElementById('prevBtn');
+                    const nextBtn = document.getElementById('nextBtn');
+                    const submitBtn = document.getElementById('submitBtn');
+
+                    prevBtn.style.display = currentStep === 1 ? 'none' : 'inline-block';
+
+                    if (currentStep === totalSteps) {
+                        nextBtn.style.display = 'none';
+                        submitBtn.style.display = 'inline-block';
+                    } else {
+                        nextBtn.style.display = 'inline-block';
+                        submitBtn.style.display = 'none';
+                    }
+
+                    // Scroll to top
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+
+                // Initialize on page load
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Show first step
+                    const firstStep = document.querySelector('[data-wizard-step="1"]');
+                    if (firstStep) {
+                        firstStep.style.display = 'block';
+                    }
+
+                    // Format date inputs to show nice format
+                    const dateInputs = document.querySelectorAll('input[type="date"]');
+                    dateInputs.forEach(input => {
+                        // Add placeholder text
+                        input.setAttribute('placeholder', 'dd MMM yyyy');
+
+                        // When date is selected, make it bold
+                        input.addEventListener('change', function() {
+                            if (this.value) {
+                                this.style.fontWeight = '500';
+                            }
+                        });
+                    });
+                });
+                ]]>
+            </script>
+        </xpath>
+
+    </template>
+</odoo>

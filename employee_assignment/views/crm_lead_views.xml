@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Assigned Employee to CRM Lead Form View -->
+    <record id="view_crm_lead_form_assigned_employee" model="ir.ui.view">
+        <field name="name">crm.lead.form.assigned.employee</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="assigned_employee_id"
+                       options="{'no_create': True, 'no_open': True}"
+                       readonly="probability in (0, 100)"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Assigned Employee to CRM Lead Tree View -->
+    <record id="view_crm_lead_tree_assigned_employee" model="ir.ui.view">
+        <field name="name">crm.lead.tree.assigned.employee</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_case_tree_view_oppor"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='user_id']" position="after">
+                <field name="assigned_employee_id" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add Assigned Employee Filter and Group By to CRM Search View -->
+    <record id="view_crm_lead_search_assigned_employee" model="ir.ui.view">
+        <field name="name">crm.lead.search.assigned.employee</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_leads_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='salesperson']" position="after">
+                <separator/>
+                <filter string="My Assigned Records" name="my_assigned"
+                        domain="[('assigned_employee_id.user_id', '=', uid)]"/>
+                <separator/>
+                <filter string="Assigned Employee" name="filter_assigned_employee"
+                        domain="[]" context="{'group_by': 'assigned_employee_id'}"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter string="Assigned Employee" name="group_assigned_employee"
+                        context="{'group_by': 'assigned_employee_id'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

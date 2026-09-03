@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Menu Item under Recruitment -->
+    <menuitem
+        id="menu_job_seeker_registration"
+        name="Job Seeker Pool"
+        parent="hr_recruitment.menu_hr_recruitment_root"
+        action="action_job_seeker_registration"
+        sequence="30"/>
+</odoo>

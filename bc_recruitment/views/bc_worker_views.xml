@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Worker List View -->
+    <record id="bc_worker_view_list" model="ir.ui.view">
+        <field name="name">bc.worker.list</field>
+        <field name="model">bc.worker</field>
+        <field name="arch" type="xml">
+            <list string="Workers" sample="1">
+                <field name="ref"/>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="nationality_id"/>
+                <field name="skill_ids" widget="many2many_tags"/>
+                <field name="availability_status"
+                       decoration-success="availability_status == 'available'"
+                       decoration-warning="availability_status == 'assigned'"
+                       decoration-danger="availability_status == 'unavailable'"/>
+                <field name="placement_count"/>
+                <field name="user_id" widget="many2one_avatar_user" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Worker Form View -->
+    <record id="bc_worker_view_form" model="ir.ui.view">
+        <field name="name">bc.worker.form</field>
+        <field name="model">bc.worker</field>
+        <field name="arch" type="xml">
+            <form string="Worker">
+                <header>
+                    <button name="action_set_available" string="Set Available" type="object"
+                            class="oe_highlight" invisible="availability_status == 'available'"/>
+                    <button name="action_set_unavailable" string="Set Unavailable" type="object"
+                            invisible="availability_status == 'unavailable'"/>
+                    <field name="availability_status" widget="statusbar"
+                           statusbar_visible="available,assigned"/>
+                </header>
+                <sheet>
+                    <field name="avatar_128" widget="image" class="oe_avatar"/>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_placements" type="object" class="oe_stat_button"
+                                icon="fa-briefcase" invisible="placement_count == 0">
+                            <field name="placement_count" widget="statinfo" string="Placements"/>
+                        </button>
+                    </div>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Worker Name" required="1"/>
+                        </h1>
+                        <h2>
+                            <field name="ref" readonly="1"/>
+                        </h2>
+                    </div>
+
+                    <group>
+                        <group string="Personal Information">
+                            <field name="partner_id"/>
+                            <field name="agency_id"/>
+                            <field name="email" widget="email"/>
+                            <field name="phone" widget="phone"/>
+                            <field name="mobile" widget="phone"/>
+                            <field name="date_of_birth"/>
+                            <field name="age"/>
+                            <field name="gender"/>
+                        </group>
+                        <group string="Location">
+                            <field name="nationality_id"/>
+                            <field name="country_id"/>
+                            <field name="user_id"/>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group string="Skills &amp; Experience">
+                            <field name="skill_ids" widget="many2many_tags"/>
+                            <field name="experience_years"/>
+                        </group>
+                        <group string="Availability">
+                            <field name="available_from"/>
+                            <field name="current_placement_id"/>
+                        </group>
+                    </group>
+
+                    <group string="Salary Expectations">
+                        <field name="expected_salary" widget="monetary"/>
+                        <field name="currency_id" invisible="1"/>
+                    </group>
+
+                    <notebook>
+                        <page string="Documents" name="documents">
+                            <group>
+                                <group string="Passport">
+                                    <field name="passport_number"/>
+                                    <field name="passport_expiry"/>
+                                    <field name="passport_copy" filename="passport_filename"/>
+                                    <field name="passport_filename" invisible="1"/>
+                                </group>
+                                <group string="Visa">
+                                    <field name="visa_number"/>
+                                    <field name="visa_expiry"/>
+                                    <field name="visa_copy" filename="visa_filename"/>
+                                    <field name="visa_filename" invisible="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Work Permit">
+                                    <field name="work_permit_number"/>
+                                    <field name="work_permit_expiry"/>
+                                    <field name="work_permit_copy" filename="work_permit_filename"/>
+                                    <field name="work_permit_filename" invisible="1"/>
+                                </group>
+                                <group string="Medical Certificate">
+                                    <field name="medical_certificate_expiry"/>
+                                    <field name="medical_certificate" filename="medical_certificate_filename"/>
+                                    <field name="medical_certificate_filename" invisible="1"/>
+                                </group>
+                            </group>
+                            <group>
+                                <group string="Resume/CV">
+                                    <field name="resume" filename="resume_filename"/>
+                                    <field name="resume_filename" invisible="1"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Education" name="education">
+                            <field name="education" placeholder="Education background and qualifications..."/>
+                        </page>
+
+                        <page string="Placements" name="placements">
+                            <field name="placement_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="job_order_id"/>
+                                    <field name="partner_id"/>
+                                    <field name="start_date"/>
+                                    <field name="end_date"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+
+                        <page string="Notes" name="notes">
+                            <field name="notes" placeholder="Internal notes about the worker..."/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Worker Kanban View -->
+    <record id="bc_worker_view_kanban" model="ir.ui.view">
+        <field name="name">bc.worker.kanban</field>
+        <field name="model">bc.worker</field>
+        <field name="arch" type="xml">
+            <kanban sample="1">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="availability_status"/>
+                <field name="skill_ids"/>
+                <field name="avatar_128"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_image">
+                                <field name="avatar_128" widget="image" class="o_image_64_cover" alt="Worker"/>
+                            </div>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title">
+                                    <field name="name"/>
+                                </strong>
+                                <div class="o_kanban_record_subtitle">
+                                    <field name="email"/>
+                                </div>
+                                <div>
+                                    <field name="skill_ids" widget="many2many_tags"/>
+                                </div>
+                                <div>
+                                    <field name="availability_status" widget="badge"
+                                           decoration-success="availability_status == 'available'"
+                                           decoration-warning="availability_status == 'assigned'"
+                                           decoration-danger="availability_status == 'unavailable'"/>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- Worker Search View -->
+    <record id="bc_worker_view_search" model="ir.ui.view">
+        <field name="name">bc.worker.search</field>
+        <field name="model">bc.worker</field>
+        <field name="arch" type="xml">
+            <search string="Workers">
+                <field name="name"/>
+                <field name="email"/>
+                <field name="phone"/>
+                <field name="passport_number"/>
+                <field name="skill_ids"/>
+                <field name="nationality_id"/>
+                <separator/>
+                <filter string="Available" name="available" domain="[('availability_status', '=', 'available')]"/>
+                <filter string="Assigned" name="assigned" domain="[('availability_status', '=', 'assigned')]"/>
+                <filter string="Unavailable" name="unavailable" domain="[('availability_status', '=', 'unavailable')]"/>
+                <separator/>
+                <filter string="Archived" name="inactive" domain="[('active', '=', False)]"/>
+                <group name="group_by">
+                    <filter string="Availability Status" name="group_availability" context="{'group_by': 'availability_status'}"/>
+                    <filter string="Nationality" name="group_nationality" context="{'group_by': 'nationality_id'}"/>
+                    <filter string="Responsible" name="group_user" context="{'group_by': 'user_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Worker Skill List View -->
+    <record id="bc_worker_skill_view_list" model="ir.ui.view">
+        <field name="name">bc.worker.skill.list</field>
+        <field name="model">bc.worker.skill</field>
+        <field name="arch" type="xml">
+            <list string="Worker Skills" editable="bottom">
+                <field name="name"/>
+                <field name="description"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Worker Skill Form View -->
+    <record id="bc_worker_skill_view_form" model="ir.ui.view">
+        <field name="name">bc.worker.skill.form</field>
+        <field name="model">bc.worker.skill</field>
+        <field name="arch" type="xml">
+            <form string="Worker Skill">
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Skill Name"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <field name="description" placeholder="Skill description..."/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Actions -->
+    <record id="action_bc_worker" model="ir.actions.act_window">
+        <field name="name">Workers</field>
+        <field name="res_model">bc.worker</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="context">{'search_default_available': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first worker
+            </p>
+            <p>
+                Register blue collar workers with their skills, documents, and availability.
+            </p>
+        </field>
+    </record>
+
+    <record id="action_bc_worker_skill" model="ir.actions.act_window">
+        <field name="name">Worker Skills</field>
+        <field name="res_model">bc.worker.skill</field>
+        <field name="view_mode">list,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first skill
+            </p>
+            <p>
+                Define skills that workers can have for better matching with job orders.
+            </p>
+        </field>
+    </record>
+
+</odoo>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add partner type flags to Partner Form View -->
+    <record id="view_partner_form_partner_types" model="ir.ui.view">
+        <field name="name">res.partner.form.partner.types</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='category_id']" position="after">
+                <field name="is_customer" widget="boolean_toggle"/>
+                <field name="is_supplier" widget="boolean_toggle"/>
+                <field name="is_agency" widget="boolean_toggle"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Add partner type flags to Partner Tree View -->
+    <record id="view_partner_tree_partner_types" model="ir.ui.view">
+        <field name="name">res.partner.tree.partner.types</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="is_customer" optional="hide"/>
+                <field name="is_agency" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
