@@ -33,6 +33,7 @@
         'hr_recruitment',
         'hr_recruitment_integration_base',
         'hr_skills',
+        'employee_assignment',
         'portal',
         'auth_signup',
         'sale_management',
