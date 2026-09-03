@@ -32,6 +32,7 @@
         'crm',
         'hr_recruitment',
         'hr_recruitment_integration_base',
+        'hr_skills',
         'portal',
         'auth_signup',
         'sale_management',
