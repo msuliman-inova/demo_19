@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Additions to the real Tax Invoice itself (not proforma-gated) - these
+         fields exist on the model already (Salesperson) or are added by this
+         module (DO Number), but core's invoice report never prints them. -->
+    <template id="report_invoice_document_it_enhancements" inherit_id="account.report_invoice_document" priority="98">
+
+        <xpath expr="//div[@id='informations']" position="inside">
+            <div class="col" t-if="o.move_type == 'out_invoice' and o.invoice_user_id" name="it_salesperson">
+                <strong>Salesperson</strong>
+                <div t-field="o.invoice_user_id.name"/>
+            </div>
+            <div class="col" t-if="o.delivery_order_number" name="it_do_number">
+                <strong>DO Number</strong>
+                <div t-field="o.delivery_order_number"/>
+            </div>
+        </xpath>
+
+        <!-- Full bank details block, matching the reference sample - Odoo's
+             own "on this account: ..." mention (elsewhere in this same div)
+             is a single terse line, not an itemized block. -->
+        <xpath expr="//div[@id='payment_term']" position="inside">
+            <div t-if="o.move_type == 'out_invoice' and o.partner_bank_id" class="mt-3" name="it_bank_details">
+                <strong>Bank Details</strong>
+                <table class="table table-sm table-borderless mb-0" style="max-width: 420px;">
+                    <tr>
+                        <td>Beneficiary Name</td>
+                        <td><span t-field="o.partner_bank_id.acc_holder_name"/></td>
+                    </tr>
+                    <tr>
+                        <td>Bank Name</td>
+                        <td><span t-field="o.partner_bank_id.bank_name"/></td>
+                    </tr>
+                    <tr>
+                        <td>IBAN / Account No</td>
+                        <td><span t-field="o.partner_bank_id.acc_number"/></td>
+                    </tr>
+                    <tr t-if="o.partner_bank_id.bank_bic">
+                        <td>SWIFT</td>
+                        <td><span t-field="o.partner_bank_id.bank_bic"/></td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Blank signature lines for a print-and-sign workflow, matching
+                 the reference sample. No e-signature capture on account.move,
+                 so these are print-only, not tied to stored signature data. -->
+            <div t-if="o.move_type == 'out_invoice'" class="row mt-5" name="it_signature_blocks">
+                <div class="col-4">
+                    <div style="height: 40px;"/>
+                    <div class="border-top pt-1">
+                        <strong>Prepared By</strong>
+                        <div t-if="o.invoice_user_id" t-field="o.invoice_user_id.name"/>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div style="height: 40px;"/>
+                    <div class="border-top pt-1">
+                        <strong>Customer Signature &amp; Seal</strong>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div style="height: 40px;"/>
+                    <div class="border-top pt-1">
+                        <strong>Authorized Signatory</strong>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+
+    </template>
+
+</odoo>
