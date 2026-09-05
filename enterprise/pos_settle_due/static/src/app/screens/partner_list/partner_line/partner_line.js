@@ -1,7 +1,7 @@
 import { PartnerLine } from "@point_of_sale/app/screens/partner_list/partner_line/partner_line";
 import { patch } from "@web/core/utils/patch";
 import { usePos } from "@point_of_sale/app/hooks/pos_hook";
-import { CustomSelectCreateDialog } from "@pos_settle_due/app/views/view_dialogs/select_create_dialog";
+import { CustomSelectCreateDialog } from "@point_of_sale/app/components/custom_select_create_dialog/custom_select_create_dialog";
 import { useService } from "@web/core/utils/hooks";
 
 patch(PartnerLine.prototype, {
