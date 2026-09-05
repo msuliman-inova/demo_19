@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_cheque_list" model="ir.ui.view">
+        <field name="name">account.cheque.list</field>
+        <field name="model">account.cheque</field>
+        <field name="arch" type="xml">
+            <list string="Post-Dated Cheques" decoration-muted="state != 'uncleared'">
+                <field name="partner_id"/>
+                <field name="document_number"/>
+                <field name="bank_id"/>
+                <field name="cheque_number"/>
+                <field name="cheque_date"/>
+                <field name="promise_date"/>
+                <field name="amount" sum="Total"/>
+                <field name="state" widget="badge" decoration-success="state == 'cleared'" decoration-danger="state == 'bounced'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_account_cheque_form" model="ir.ui.view">
+        <field name="name">account.cheque.form</field>
+        <field name="model">account.cheque</field>
+        <field name="arch" type="xml">
+            <form string="Post-Dated Cheque">
+                <header>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="move_id"/>
+                            <field name="document_number"/>
+                        </group>
+                        <group>
+                            <field name="bank_id"/>
+                            <field name="cheque_number"/>
+                            <field name="cheque_date"/>
+                            <field name="promise_date"/>
+                            <field name="currency_id" groups="base.group_multi_currency"/>
+                            <field name="amount"/>
+                        </group>
+                    </group>
+                    <field name="note" placeholder="Notes..."/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_account_cheque" model="ir.actions.act_window">
+        <field name="name">Post-Dated Cheques</field>
+        <field name="res_model">account.cheque</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_uncleared': 1}</field>
+    </record>
+
+    <record id="view_account_cheque_search" model="ir.ui.view">
+        <field name="name">account.cheque.search</field>
+        <field name="model">account.cheque</field>
+        <field name="arch" type="xml">
+            <search string="Post-Dated Cheques">
+                <field name="partner_id"/>
+                <field name="cheque_number"/>
+                <field name="document_number"/>
+                <filter name="uncleared" string="Uncleared" domain="[('state', '=', 'uncleared')]"/>
+                <filter name="cleared" string="Cleared" domain="[('state', '=', 'cleared')]"/>
+                <group>
+                    <filter name="group_partner" string="Customer" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <menuitem id="menu_account_cheque"
+              name="Post-Dated Cheques"
+              parent="account.menu_finance_receivables"
+              action="action_account_cheque"
+              sequence="20"/>
+</odoo>

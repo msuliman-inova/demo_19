@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inherit_it_reports_statement" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.it.reports.statement</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="object" name="action_view_cheques" class="oe_stat_button" icon="fa-money">
+                    <field name="cheque_count" widget="statinfo" string="Cheques"/>
+                </button>
+            </xpath>
+            <xpath expr="//div[hasclass('oe_button_box')]" position="after">
+                <button type="action"
+                        name="%(it_reports.action_statement_of_accounts_wizard)d"
+                        string="Print Statement of Accounts"
+                        context="{'default_partner_id': id}"
+                        class="btn-secondary mt-2"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
