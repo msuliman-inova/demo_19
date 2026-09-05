@@ -28,13 +28,21 @@ export function pdfPreviewHandler(action, options, env) {
         return false;
     }
 
-    const reportUrl = `/report/pdf/${action.report_name}/${activeIds.join(",")}`;
+    // Same context Download below already sends - without it, the preview
+    // iframe fetches /report/pdf with no context at all, so the server falls
+    // back to the session's own default company and raises a multi-company
+    // AccessError for any record that isn't in that company, even though the
+    // action that opened this dialog already knew the right one (e.g.
+    // printing a record from a company the user has access to but isn't
+    // currently their active one).
+    const ctx = { ...user.context, ...action.context };
+    const reportUrl = `/report/pdf/${action.report_name}/${activeIds.join(",")}` +
+        `?context=${encodeURIComponent(JSON.stringify(ctx))}`;
 
     env.services.dialog.add(PreviewDialog, {
         reportUrl,
         reportName: action.name || action.display_name || "",
         onDownload() {
-            const ctx = { ...user.context, ...action.context };
             downloadReport(rpc, action, "pdf", ctx);
         },
     });
