@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inherit_it_contacts_coding" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.it.contacts.coding</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[field[@name='properties']]" position="before">
+                <group name="it_contacts_coding" string="Partner Coding">
+                    <field name="is_customer" widget="boolean_toggle"/>
+                    <field name="customer_code" readonly="1" invisible="not customer_code"/>
+                    <field name="is_supplier" widget="boolean_toggle"/>
+                    <field name="supplier_code" readonly="1" invisible="not supplier_code"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_partner_tree_inherit_it_contacts_coding" model="ir.ui.view">
+        <field name="name">res.partner.list.inherit.it.contacts.coding</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list" position="inside">
+                <field name="customer_code" optional="hide"/>
+                <field name="supplier_code" optional="hide"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

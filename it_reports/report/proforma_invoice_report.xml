@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="action_report_it_proforma_invoice" model="ir.actions.report">
+        <field name="name">Proforma Invoice</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">it_reports.report_it_proforma_invoice</field>
+        <field name="report_file">it_reports.report_it_proforma_invoice</field>
+        <field name="print_report_name">'Proforma Invoice - %s' % (object.name)</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <!-- sale.report_saleorder_pro_forma already exists in core and does exactly
+         what's needed: sets is_pro_forma/proforma context and calls
+         sale.report_saleorder_document. No need to reimplement it - just call it
+         and let the is_proforma-gated additions below extend the same document
+         the native (if enabled) Pro-Forma feature already uses. -->
+    <template id="report_it_proforma_invoice">
+        <t t-call="sale.report_saleorder_pro_forma"/>
+    </template>
+
+    <template id="report_saleorder_document_it_proforma" inherit_id="sale.report_saleorder_document" priority="99">
+
+        <!-- Company TRN under the title - not shown by default. -->
+        <xpath expr="(//div[hasclass('oe_structure')])[1]" position="before">
+            <p t-if="is_proforma and doc.company_id.vat" class="text-end text-muted mb-0">
+                <strong>TRN:</strong> <span t-field="doc.company_id.vat"/>
+            </p>
+        </xpath>
+
+        <!-- Extra info columns for the proforma: Customer Code (from
+             it_contacts), Prof No (the quotation number - already shown in the
+             title too, but the client's layout wants it as its own field),
+             Currency, and Payment Terms. -->
+        <xpath expr="//div[@id='informations']" position="inside">
+            <div class="col" t-if="is_proforma and doc.partner_id.customer_code" name="proforma_customer_code">
+                <strong>Customer Code</strong>
+                <div t-field="doc.partner_id.customer_code"/>
+            </div>
+            <div class="col" t-if="is_proforma" name="proforma_number">
+                <strong>Prof No</strong>
+                <div t-field="doc.name"/>
+            </div>
+            <div class="col" t-if="is_proforma" name="proforma_currency">
+                <strong>Currency</strong>
+                <div t-field="doc.currency_id.name"/>
+            </div>
+            <div class="col" t-if="is_proforma and doc.payment_term_id" name="proforma_payment_terms">
+                <strong>Payment Terms</strong>
+                <div t-field="doc.payment_term_id.name"/>
+            </div>
+        </xpath>
+
+        <!-- The line-item columns the client wants (SL/Code/UOM as its own
+             column instead of merged into Quantity, split Taxable/VAT%/VAT
+             Amt/Inc.VAT) don't exist in core, so this part is a genuine
+             replacement either way - core's table also carries section/
+             subsection/combo grouping a proforma preview doesn't need. -->
+        <xpath expr="//table[.//th[@name='th_description']]" position="attributes">
+            <attribute name="t-if">not is_proforma</attribute>
+        </xpath>
+        <xpath expr="//table[.//th[@name='th_description']]" position="after">
+            <table t-if="is_proforma" class="o_has_total_table table o_main_table table-borderless">
+                <thead style="display: table-row-group">
+                    <tr>
+                        <th class="text-center">SL</th>
+                        <th>Code</th>
+                        <th>Description</th>
+                        <th class="text-center">UOM</th>
+                        <th class="text-end">Qty</th>
+                        <th class="text-end">Unit Price</th>
+                        <th class="text-end">Taxable Amt</th>
+                        <th class="text-end">Vat %</th>
+                        <th class="text-end">Vat Amt</th>
+                        <th class="text-end">Amt Inc.Vat</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="proforma_lines" t-value="doc.order_line.filtered(lambda l: not l.display_type)"/>
+                    <t t-foreach="proforma_lines" t-as="line">
+                        <tr>
+                            <td class="text-center"><t t-esc="line_index + 1"/></td>
+                            <td><span t-field="line.product_id.default_code"/></td>
+                            <td><span t-field="line.name"/></td>
+                            <td class="text-center"><span t-field="line.product_uom_id"/></td>
+                            <td class="text-end"><span t-field="line.product_uom_qty"/></td>
+                            <td class="text-end"><span t-field="line.price_unit"/></td>
+                            <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                            <td class="text-end">
+                                <t t-esc="'%.2f' % line.tax_ids[0].amount" t-if="line.tax_ids"/>
+                                <t t-else="">0.00</t>
+                            </td>
+                            <td class="text-end">
+                                <span t-esc="line.price_total - line.price_subtotal"
+                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                            </td>
+                            <td class="text-end"><span t-field="line.price_total"/></td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </xpath>
+
+        <!-- Amount in words - no built-in equivalent on sale.order (unlike
+             account.move's amount_total_words), so this is a real addition. -->
+        <xpath expr="//div[@name='so_total_summary']" position="after">
+            <p t-if="is_proforma" class="text-end lh-sm">
+                Amount in words: <br/>
+                <small class="text-muted lh-sm">
+                    <span t-esc="doc.currency_id.amount_to_text(doc.amount_total)"/>
+                </small>
+            </p>
+        </xpath>
+
+        <!-- Not a Tax Invoice disclaimer, required since a proforma has no
+             legal/fiscal standing under UAE FTA rules. Terms and Conditions
+             (doc.note) is already shown by core right before this. -->
+        <xpath expr="//span[@name='order_note']" position="after">
+            <p t-if="is_proforma" class="text-muted mt-2">
+                <em>This is a Proforma Invoice, not a Tax Invoice, and has no legal or fiscal value.</em>
+            </p>
+        </xpath>
+
+    </template>
+
+</odoo>

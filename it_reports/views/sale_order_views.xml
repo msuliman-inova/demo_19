@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit_it_reports_proforma" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.it.reports.proforma</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//button[@name='action_confirm'][1]" position="before">
+                <button
+                    string="Print Proforma Invoice"
+                    name="%(it_reports.action_report_it_proforma_invoice)d"
+                    type="action"
+                    class="btn-secondary"
+                    data-hotkey="p"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
